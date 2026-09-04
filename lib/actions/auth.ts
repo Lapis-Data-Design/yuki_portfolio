@@ -1,11 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { authenticateUser, createSession, clearSession } from "@/lib/auth";
-
-function dashboardPathFor(role: "owner" | "admin"): string {
-    return role === "owner" ? "/dashboard/owner" : "/dashboard/admin";
-}
+import { authenticateUser, createSession, clearSession, dashboardPathFor } from "@/lib/auth";
 
 export async function loginAction(
     _prevState: { error: string | null },
