@@ -12,7 +12,7 @@ const SESSION_COOKIE = "session";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7;
 const BCRYPT_ROUNDS = 12;
 
-type Role = ( typeof roles)[number];
+type Role = (typeof roles)[number];
 
 // ---- Passwords ---------------------------------------
 
@@ -103,7 +103,7 @@ export async function getSession(): Promise<{
     if (!row) return null;
 
     if (row.session.expiresAt < new Date()) {
-        // Clear up expired sessoin from table
+        // Clean up expired sessoin from table
         await db.delete(sessions).where(eq(sessions.id, token));
         cookieStore.delete(SESSION_COOKIE);
         return null;
@@ -135,4 +135,71 @@ export async function requireOwner() {
 
 export async function requireAdmin() {
     return requireRole("admin");
+}
+
+export async function requireUser() {
+    const session = await getSession();
+    if (!session) {
+        redirect("/login");
+    }
+    return session.user;
+}
+
+
+// ---- Account changes (email / password) ------------------
+
+export function generateTempoeraryPassword(): string {
+    return randomBytes(12).toString("base64url");
+};
+
+export async function updateUserEmail(
+    userId: number,
+    newEmail: string
+): Promise<{ success: true } | { success: false; error: string }> {
+    const [existing] = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.email, newEmail))
+        .limit(1);
+
+        if (existing && existing.id !== userId) {
+            return { success: false, error: "That email is already in use." };
+        }
+
+        await db.update(users).set({ email: newEmail }).where(eq(users.id, userId));
+        return { success: true };
+}
+
+export async function updateUserPassword(
+    userId: number,
+    currentPassword: string,
+    newPassword: string
+): Promise<{ success: true } | { success: false; error: string }> {
+    const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+        if (!user) {
+            return { success: false, error: "User not found" };
+        }
+
+        const valid = await verifyPassword(currentPassword, user.passwordHash);
+        if (!valid) {
+            return { success: false,  error: "Current password is incorrect." };
+        }
+
+        if (newPassword.length < 8) {
+            return { success: false,  error: "New password must be at leadt 8 characters." };
+        }
+
+        const newHash = await hashPassword(newPassword);
+
+        await db
+            .update(users)
+            .set({passwordHash: newHash, mustChangePassword: false })
+            .where(eq(users.id, userId));
+        
+        return { success: true }; 
 }
