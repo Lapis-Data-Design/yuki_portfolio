@@ -3,6 +3,10 @@
 import { redirect } from "next/navigation";
 import { authenticateUser, createSession, clearSession } from "@/lib/auth";
 
+function dashboardPathFor(role: "owner" | "admin"): string {
+    return role === "owner" ? "/dashboard/owner" : "/dashboard/admin";
+}
+
 export async function loginAction(
     _prevState: { error: string | null },
     formData: FormData
@@ -21,7 +25,11 @@ export async function loginAction(
 
     await createSession(user.id);
 
-    redirect(user.role === "owner" ? "/dashboard/owner" : "/dashboard/admin" );
+    if (user.mustChangePassword) {
+        redirect("/change-password");
+    }
+
+    redirect(dashboardPathFor(user.role));
 }
 
 export async function logoutAction(): Promise<void> {
