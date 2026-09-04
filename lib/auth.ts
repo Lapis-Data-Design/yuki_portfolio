@@ -128,7 +128,6 @@ async function requireRole(role: Role) {
     return session.user;
 }
 
-
 export async function requireOwner() {
     return requireRole("owner");
 }
@@ -145,6 +144,9 @@ export async function requireUser() {
     return session.user;
 }
 
+export function dashboardPathFor(role: "owner" | "admin"): string {
+    return role === "owner" ? "/dashboard/owner" : "/dashboard/admin";
+}
 
 // ---- Account changes (email / password) ------------------
 
