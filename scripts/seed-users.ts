@@ -1,7 +1,7 @@
-import { db } from "../db/client";
-import { users } from "../db/schema";
-import { hashPassword, generateTemporaryPassword } from "@/lib/auth";
+import { config } from "dotenv";
 import { eq } from "drizzle-orm";
+
+config({ path: ".env.local" });
 
 const ACCOUNTS = [
     { email: "elysabward@gmail.com", role: "admin" as const },
@@ -9,6 +9,10 @@ const ACCOUNTS = [
 ];
 
 async function seed() {
+    const { db } = await import("../db/client");
+    const { users } = await import("../db/schema");
+    const { hashPassword, generateTemporaryPassword } = await import("@/lib/auth");
+
     for (const account of ACCOUNTS) {
         const [existing] = await db
             .select({ id: users.id })
