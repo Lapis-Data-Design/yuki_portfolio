@@ -150,7 +150,7 @@ export function dashboardPathFor(role: "owner" | "admin"): string {
 
 // ---- Account changes (email / password) ------------------
 
-export function generateTempoeraryPassword(): string {
+export function generateTemporaryPassword(): string {
     return randomBytes(12).toString("base64url");
 };
 
