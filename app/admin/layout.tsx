@@ -1,6 +1,11 @@
 import { requireAdmin } from "@/lib/auth";
 import { LogoutButton } from "../_components/logout-button";
 
+const NAV_ITEMS = [
+    { href: "/dashboard/admin", label: "Overview"},
+    { href: "/dashboard/admin/account", label: "Account"}
+]
+
 export default async function AdminDashboardLayout({
     children,
 }: {
@@ -18,6 +23,17 @@ export default async function AdminDashboardLayout({
                     <p className="font-sans text-lg font-semibold text-[#2B2119] mb-8">
                         Admin dashboard
                     </p>
+                    <nav className="space-y-3"> 
+                        {NAV_ITEMS.map((item) => (
+                            <a
+                                key={item.href}
+                                href={item.href}
+                                 className="block font-serif text-sm text-[#2B2119] hover:text-[#A6472B] transition-colors"
+                            >
+                                {item.label}
+                            </a>
+                        ))}
+                    </nav>
                 </div>
 
                 <div>
