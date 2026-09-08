@@ -145,7 +145,7 @@ export async function requireUser() {
 }
 
 export function dashboardPathFor(role: "owner" | "admin"): string {
-    return role === "owner" ? "/dashboard/owner" : "/dashboard/admin";
+    return role === "owner" ? "/owner" : "/admin";
 }
 
 // ---- Account changes (email / password) ------------------

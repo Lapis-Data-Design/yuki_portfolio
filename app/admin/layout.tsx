@@ -2,8 +2,8 @@ import { requireAdmin } from "@/lib/auth";
 import { LogoutButton } from "../_components/logout-button";
 
 const NAV_ITEMS = [
-    { href: "/dashboard/admin", label: "Overview"},
-    { href: "/dashboard/admin/account", label: "Account"}
+    { href: "/admin", label: "Overview"},
+    { href: "/admin/account", label: "Account"}
 ]
 
 export default async function AdminDashboardLayout({
