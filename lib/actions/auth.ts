@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { authenticateUser, createSession, clearSession } from "@/lib/auth";
+import { authenticateUser, createSession, clearSession, dashboardPathFor } from "@/lib/auth";
 
 export async function loginAction(
     _prevState: { error: string | null },
@@ -21,7 +21,11 @@ export async function loginAction(
 
     await createSession(user.id);
 
-    redirect(user.role === "owner" ? "/dashboard/owner" : "/dashboard/admin" );
+    if (user.mustChangePassword) {
+        redirect("/change-password");
+    }
+
+    redirect(dashboardPathFor(user.role));
 }
 
 export async function logoutAction(): Promise<void> {

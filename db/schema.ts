@@ -13,6 +13,7 @@ export const users = pgTable("users", {
     email: text("email").notNull().unique(),
     passwordHash: text("password_hash").notNull(),
     role: text("role", { enum: roles }).notNull(),
+    mustChangePassword: boolean("must_change_password").notNull().default(true),
     createdAt: timestamp("created_at").notNull().defaultNow(),
 })
 
