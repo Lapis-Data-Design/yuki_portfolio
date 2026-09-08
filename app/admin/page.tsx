@@ -8,7 +8,7 @@ export default function AdminDashboardHome() {
                 Admin Dashboard
             </h1>
             <p className="font-serif text-[#2B2119] max-w-md">
-                 Site health, deploy status, and storage usage will surface here.
+                    Site health, deploy status, and storage usage will surface here.
                     Placeholder for now — real infrastructure access still lives in
                     Vercel, Neon, and Cloudflare directly.
             </p>

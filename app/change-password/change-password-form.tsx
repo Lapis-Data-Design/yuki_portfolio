@@ -7,7 +7,7 @@ import { updateAccountAction } from "@/lib/actions/account";
 
 const initialState = { error: null as string | null, success: false };
 
-export function ChangePasswordForm({ dashboardPath }: { dashboardpath: string }) {
+export function ChangePasswordForm({ dashboardPath}: { dashboardPath: string }) {
     const [state, formAction, pending] = useActionState(updateAccountAction, initialState);
     const router = useRouter();
 
