@@ -133,7 +133,7 @@ export async function requireUser() {
 }
 
 export function dashboardPathFor(role: "owner" | "admin"): string {
-    return role === "owner" ? "/owner" : "/admin";
+    return role === "owner" ? "/dashboard/owner" : "/dashboard/admin";
 }
 
 // ---- Account changes (email / password) ------------------
