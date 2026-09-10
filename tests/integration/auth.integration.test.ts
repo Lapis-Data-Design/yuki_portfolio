@@ -9,14 +9,14 @@ import {
     updateUserEmail,
     updateUserPassword,
 } from "@/lib/auth";
+import { cleanupTestUsers } from "./db-helpers";
 
 const TEST_EMAIL = "test-user-@example.test";
 const TEST_EMAIL_2 = "test-user-2@example.test";
 const TEST_PASSWORD = "test-password-do-not-use-elsewhere";
 
 afterEach(async () => {
-    await db.delete(users).where(eq(users.email, TEST_EMAIL));
-    await db.delete(users).where(eq(users.email, TEST_EMAIL_2));
+    await cleanupTestUsers();
 });
 
 describe("authehticateUser", () => {
