@@ -11,7 +11,7 @@ const ACCOUNTS = [
 async function seed() {
     const { db } = await import("../db/client");
     const { users } = await import("../db/schema");
-    const { hashPassword, generateTemporaryPassword } = await import("@/lib/auth");
+    const { hashPassword, generateTemporaryPassword } = await import("@/lib/password");
 
     for (const account of ACCOUNTS) {
         const [existing] = await db
