@@ -3,29 +3,17 @@ import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { randomBytes } from "crypto";
-import { hash, compare } from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { users, sessions, type roles } from "@/db/schema";
+import { hashPassword, verifyPassword, generateTemporaryPassword } from "@/lib/password";
+
+export { hashPassword, verifyPassword, generateTemporaryPassword };
 
 const SESSION_COOKIE = "session";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7;
-const BCRYPT_ROUNDS = 12;
 
 type Role = (typeof roles)[number];
-
-// ---- Passwords ---------------------------------------
-
-export async function hashPassword(password: string): Promise<string> {
-    return hash(password, BCRYPT_ROUNDS);
-}
-
-export async function verifyPassword(
-    password: string,
-    passwordHash: string
-): Promise<boolean> {
-    return compare(password, passwordHash);
-}
 
 // ---- Credential check (no session side effect) ------
 
@@ -149,10 +137,6 @@ export function dashboardPathFor(role: "owner" | "admin"): string {
 }
 
 // ---- Account changes (email / password) ------------------
-
-export function generateTemporaryPassword(): string {
-    return randomBytes(12).toString("base64url");
-};
 
 export async function updateUserEmail(
     userId: number,
