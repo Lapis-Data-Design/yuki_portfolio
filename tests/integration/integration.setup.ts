@@ -5,3 +5,12 @@ import { config } from "dotenv";
 // test that imports db/client.ts runs — otherwise DATABASE_URL is empty
 // at the moment db/client.ts constructs its Neon connection.
 config({ path: ".env.test" });
+
+if (process.env.NEON_BRANCH !== "test") {
+    throw new Error(
+        `Integration tests require NEON_BRANCH to be "test", but it was ` +
+        `${JSON.stringify(process.env.NEON_BRANCH ?? null)}. Refusing to run ` +
+        `— check .env.test and confirm NEON_BRANCH is set correctly before ` +
+        `re-running.`
+    );
+}
