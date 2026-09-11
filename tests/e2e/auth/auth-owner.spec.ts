@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import { E2E_OWNER_EMAIL, E2E_OWNER_TEMP_PASSWORD } from "../global-setup";
+import { E2E_OWNER_EMAIL, E2E_OWNER_TEMP_PASSWORD } from "../fixtures/accounts";
 
 const NEW_PASSWORD = "e2e-new-password-2";
 
