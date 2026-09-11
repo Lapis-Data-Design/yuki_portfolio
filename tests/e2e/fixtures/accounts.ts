@@ -7,7 +7,7 @@ export const E2E_OWNER_EMAIL = "e2e-owner@example.test";
 export const E2E_OWNER_TEMP_PASSWORD = "e2e-temp-password-1";
 
 export const E2E_ADMIN_EMAIL = "e2e-admin@example.test";
-export const E2E_ADMIN_TEMP_PASSWORD = "e2e-temp-password-2";
+export const E2E_ADMIN_PASSWORD = "e2e-temp-password-2";
 
 export const E2E_ROLE_TEST_OWNER_EMAIL = "e2e-role-owner@example.test";
 export const E2E_ROLE_TEST_OWNER_PASSWORD = "e2e-role-owner-password-1";
@@ -42,7 +42,7 @@ export async function seedTestAccounts(): Promise<void> {
         mustChangePassword: true,
     });
 
-    const adminHash = await hashPassword(E2E_ADMIN_TEMP_PASSWORD);
+    const adminHash = await hashPassword(E2E_ADMIN_PASSWORD);
     await db.insert(users).values({
         email: E2E_ADMIN_EMAIL,
         passwordHash: adminHash,
