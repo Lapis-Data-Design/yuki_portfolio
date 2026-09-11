@@ -9,7 +9,7 @@ import {
     updateUserEmail,
     updateUserPassword,
 } from "@/lib/auth";
-import { cleanupTestUsers } from "./db-helpers";
+import { cleanupTestUsers } from "../helpers/db-helpers";
 
 const TEST_EMAIL = "test-user-@example.test";
 const TEST_EMAIL_2 = "test-user-2@example.test";
