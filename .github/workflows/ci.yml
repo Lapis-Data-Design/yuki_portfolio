@@ -46,7 +46,7 @@ jobs:
         if: github.event_name == 'pull-request'
         needs: integration
         env:
-            DATABASE_URL: ${{ secrets.DATABASE_URL }}
+            DATABASE_URL: ${{ secrets.NEON_TEST_DATABASE_URL }}
             NEON_BRANCH: test
         steps:
             -   uses: actions/checkout@v4
@@ -55,7 +55,7 @@ jobs:
                     node-version: 20
                     cache: npm
             -   run: npm ci
-            -   run: npx playwright install --with-depschromuim
+            -   run: npx playwright install --with-deps chromuim
             -   run: npm run test:e2e
             -   name: Upload Playwright report
                 if: always()
