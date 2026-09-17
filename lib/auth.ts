@@ -177,7 +177,7 @@ export async function updateUserPassword(
         }
 
         if (newPassword.length < 8) {
-            return { success: false,  error: "New password must be at leadt 8 characters." };
+            return { success: false,  error: "New password must be at least 8 characters." };
         }
 
         const newHash = await hashPassword(newPassword);
