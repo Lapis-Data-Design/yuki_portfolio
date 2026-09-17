@@ -1,4 +1,4 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import { 
     E2E_ROLE_TEST_OWNER_EMAIL,
     E2E_ROLE_TEST_OWNER_PASSWORD,
@@ -7,7 +7,7 @@ import {
 } from "../fixtures/accounts";
 import { login } from "../fixtures/auth-actions";
 
-test.fixme("owner is blocked from the admin dashbaord", async ({ page }) => {
+test.fixme("owner is blocked from the admin dashboard", async ({ page }) => {
     await login(page, E2E_ROLE_TEST_OWNER_EMAIL, E2E_ROLE_TEST_OWNER_PASSWORD);
     await expect(page).toHaveURL("/dashboard/owner");
 
