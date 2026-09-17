@@ -10,12 +10,16 @@ export const E2E_ADMIN_EMAIL = "e2e-admin@example.test";
 export const E2E_ADMIN_PASSWORD = "e2e-temp-password-2";
 
 export const E2E_ROLE_TEST_OWNER_EMAIL = "e2e-role-owner@example.test";
-export const E2E_ROLE_TEST_OWNER_PASSWORD = "e2e-role-owner-password-1";
+export const E2E_ROLE_TEST_OWNER_PASSWORD = "e2e-role-owner-password-3";
+
+export const E2E_ADMIN_JOURNEY_EMAIL = "e2e-admin-journey@example.test";
+export const E2E_ADMIN_JOURNEY_TEMP_PASSWORD = "e2e-admin-journey-temp-4";
 
 export const ALL_TEST_EMAILS = [
     E2E_OWNER_EMAIL,
     E2E_ADMIN_EMAIL,
-    E2E_ROLE_TEST_OWNER_EMAIL
+    E2E_ROLE_TEST_OWNER_EMAIL,
+    E2E_ADMIN_JOURNEY_EMAIL
 ]
 
 export async function cleanupTestAccounts(): Promise<void> {
@@ -57,4 +61,12 @@ export async function seedTestAccounts(): Promise<void> {
         role: "owner",
         mustChangePassword: false,
     });
+
+    const adminJourneyHash = await hashPassword(E2E_ADMIN_JOURNEY_TEMP_PASSWORD);
+    await db.insert(users).values({
+        email: E2E_ADMIN_JOURNEY_EMAIL,
+        passwordHash: adminJourneyHash,
+        role: "admin",
+        mustChangePassword: true,
+    })
 }
