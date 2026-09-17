@@ -7,8 +7,10 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { users, sessions, type roles } from "@/db/schema";
 import { hashPassword, verifyPassword, generateTemporaryPassword } from "@/lib/password";
+import { dashboardPathFor } from "./dashboard-path";
 
 export { hashPassword, verifyPassword, generateTemporaryPassword };
+export { dashboardPathFor};
 
 const SESSION_COOKIE = "session";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7;
@@ -130,10 +132,6 @@ export async function requireUser() {
         redirect("/login");
     }
     return session.user;
-}
-
-export function dashboardPathFor(role: "owner" | "admin"): string {
-    return role === "owner" ? "/dashboard/owner" : "/dashboard/admin";
 }
 
 // ---- Account changes (email / password) ------------------
