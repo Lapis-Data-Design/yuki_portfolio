@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from "../test-utils";
+import { describe, it, expect, afterEach } from "../../test-utils";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { users } from "@/db/schema";
