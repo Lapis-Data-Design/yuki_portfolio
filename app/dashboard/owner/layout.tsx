@@ -1,4 +1,4 @@
-import { requireOwner } from "@/lib/auth";
+import { requireOwnerOrAdmin } from "@/lib/auth";
 import { LogoutButton } from "../../_components/logout-button";
 
 const NAV_ITEMS = [
@@ -14,7 +14,7 @@ export default async function OwnerDashboardLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const user = await requireOwner();
+    const user = await requireOwnerOrAdmin();
 
     return (
         <div className="min-h-screen bg-[#E8DEC6] flex">
