@@ -7,7 +7,6 @@ import {
     updateUserEmail,
     updateUserPassword,
 } from "@/lib/auth";
-import { verify } from "crypto";
 
 type AccountFormState = {
     success: boolean;
@@ -25,7 +24,7 @@ export async function updateAccountAction(
     const newPassword = formData.get("newPassword");
 
     if (typeof currentPassword !== "string" || !currentPassword) {
-        return { success: false, error: "Current passowrd is required to make changes." };
+        return { success: false, error: "Current password is required to make changes." };
     }
 
     const passwordValid = await verifyPassword(currentPassword, user.passwordHash);
