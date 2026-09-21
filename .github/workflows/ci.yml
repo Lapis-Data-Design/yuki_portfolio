@@ -55,7 +55,7 @@ jobs:
                     node-version: 24
                     cache: npm
             -   run: npm ci
-            -   run: npx playwright install --with-deps chromuim
+            -   run: npx playwright install --with-deps chromium
             -   run: npm run test:e2e
             -   name: Upload Playwright report
                 if: always()
