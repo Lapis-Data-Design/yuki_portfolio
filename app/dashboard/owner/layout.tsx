@@ -1,5 +1,5 @@
 import { requireOwner } from "@/lib/auth";
-import { LogoutButton } from "../_components/logout-button";
+import { LogoutButton } from "../../_components/logout-button";
 
 const NAV_ITEMS = [
     { href: "/dashboard/owner", label: "Overview" },
