@@ -43,7 +43,7 @@ jobs:
     e2e:
         name: E2E tests (Playwright + Neon test branch)
         runs-on: ubuntu-latest
-        if: github.event_name == 'pull-request'
+        if: github.event_name == 'pull_request'
         needs: integration
         env:
             DATABASE_URL: ${{ secrets.NEON_TEST_DATABASE_URL }}
