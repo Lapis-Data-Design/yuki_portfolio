@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from "../../test-utils";
+import { describe, it, expect, beforeEach } from "../../test-utils";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { users } from "@/db/schema";
@@ -9,14 +9,16 @@ import {
     updateUserEmail,
     updateUserPassword,
 } from "@/lib/auth";
-import { cleanupTestUsers } from "../helpers/db-helpers";
+import { cleanupUsersByEmailPattern } from "@/tests/helpers/user-cleanup";
+
 
 const TEST_EMAIL = "test-user-@example.test";
 const TEST_EMAIL_2 = "test-user-2@example.test";
 const TEST_PASSWORD = "test-password-do-not-use-elsewhere";
 
-afterEach(async () => {
-    await cleanupTestUsers();
+
+beforeEach(async () => {
+    await cleanupUsersByEmailPattern("%@example.test");
 });
 
 describe("authehticateUser", () => {
@@ -136,7 +138,23 @@ describe("updateUserPassword", () => {
     });
 
     it("fails when the current password is wrong", async () => {
+        const passwordHash = await hashPassword(TEST_PASSWORD);
+        const [user] = await db
+            .insert(users)
+            .values({
+                email: TEST_EMAIL,
+                passwordHash,
+                role: "owner",
+                mustChangePassword: true,
+            })
+            .returning();
 
+        const result = await updateUserPassword(
+            user.id,
+            "wrong-current-password",
+            "a-new-valid-password"
+        );
+        expect(result.success).toBe(false);
     });
 
     it("fails when the new password is under 8 characters", async () => {
