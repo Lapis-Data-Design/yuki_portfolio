@@ -14,13 +14,13 @@ export default async function AdminDashboardLayout({
     const user = await requireAdminOnly();
 
     return (
-        <div className="min-h-screen bg-[#E8DEC6] flex">
-            <aside className="w-56 shrink-0 border-r border-[#2B2119]/15 px-6 py-8 flex flex-col justify-between">
+        <div className="min-h-screen bg-background flex">
+            <aside className="w-56 shrink-0 border-r border-text-primary/15 px-6 py-8 flex flex-col justify-between">
                 <div>
-                    <p className="font-mono text-xs tracking-wide text-[#8C5A4E] mb-1">
+                    <p className="font-mono text-xs tracking-wide text-accent-soft mb-1">
                         No. 000
                     </p>
-                    <p className="font-sans text-lg font-semibold text-[#2B2119] mb-8">
+                    <p className="font-sans text-lg font-semibold text-text-primary mb-8">
                         Admin dashboard
                     </p>
                     <nav className="space-y-3"> 
@@ -28,7 +28,7 @@ export default async function AdminDashboardLayout({
                             <a
                                 key={item.href}
                                 href={item.href}
-                                 className="block font-serif text-sm text-[#2B2119] hover:text-[#A6472B] transition-colors"
+                                 className="block font-serif text-sm text-text-primary hover:text-accent-primary transition-colors"
                             >
                                 {item.label}
                             </a>
@@ -37,7 +37,7 @@ export default async function AdminDashboardLayout({
                 </div>
 
                 <div>
-                    <p className="font-serif text-xs text-[#8C5A4E] mb-2">
+                    <p className="font-serif text-xs text-accent-soft mb-2">
                         {user.email}
                     </p>
                     <LogoutButton />
