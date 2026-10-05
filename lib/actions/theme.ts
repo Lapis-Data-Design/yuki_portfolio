@@ -3,10 +3,10 @@
 import { db } from "@/db/client";
 import { themePalettes } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { requireOwner } from "@/lib/auth";
+import { requireOwnerOrAdmin } from "@/lib/auth";
 
 export async function activatePalette(paletteId: number) {
-    await requireOwner();
+    await requireOwnerOrAdmin();
 
     await db.transaction(async (tx) => {
         await tx

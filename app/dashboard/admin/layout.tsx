@@ -1,9 +1,9 @@
-import { requireAdmin } from "@/lib/auth";
+import { requireAdminOnly } from "@/lib/auth";
 import { LogoutButton } from "../../_components/logout-button";
 
 const NAV_ITEMS = [
-    { href: "/admin", label: "Overview"},
-    { href: "/admin/account", label: "Account"}
+    { href: "/dashboard/admin", label: "Overview"},
+    { href: "/dashboard/admin/account", label: "Account"}
 ]
 
 export default async function AdminDashboardLayout({
@@ -11,7 +11,7 @@ export default async function AdminDashboardLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const user = await requireAdmin();
+    const user = await requireAdminOnly();
 
     return (
         <div className="min-h-screen bg-[#E8DEC6] flex">

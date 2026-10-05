@@ -27,7 +27,7 @@ describe("hashPassword / verifyPassword", () => {
     })
 
     it("does not verify a plaintext password against itself as if it were a hash", async () => {
-        const result = await verifyPassword("some-passowrd", "some-passowrd");
+        const result = await verifyPassword("some-password", "some-password");
         expect(result).toBe(false);
     });
 });
@@ -46,7 +46,7 @@ describe("generateTemporaryPassword", () => {
     })
 
     it("contains no leading or trailing whitespace", () => {
-        const passowrd = generateTemporaryPassword();
-        expect(passowrd).toBe(passowrd.trim());
+        const password = generateTemporaryPassword();
+        expect(password).toBe(password.trim());
     });
 });

@@ -104,15 +104,15 @@ export async function getSession(): Promise<{
 
 // ---- Role gates, for use at top of Server Actions ----------------
 
-async function requireRole(role: Role) {
+async function requireRole(...allowedRoles: Role[]) {
     const session = await getSession();
 
     if (!session) {
         redirect("/login");
     }
 
-    if (session.user.role !== role) {
-        redirect("/login");
+    if (!allowedRoles.includes(session.user.role)) {
+        redirect("/unauthorized");
     }
 
     return session.user;
@@ -122,8 +122,12 @@ export async function requireOwner() {
     return requireRole("owner");
 }
 
-export async function requireAdmin() {
+export async function requireAdminOnly() {
     return requireRole("admin");
+}
+
+export async function requireOwnerOrAdmin() {
+    return requireRole("owner", "admin");
 }
 
 export async function requireUser() {
