@@ -7,6 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "seed:users": "tsx scripts/seed-users.ts",
+    "seed:palettes": "tsx scripts/seed-palettes",
+    "seed:palettes:test": "ENV_FILE=.env.test tsx scripts/seed-palettes.ts",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run --config vitest.config.ts",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "test:e2e": "playwright test"

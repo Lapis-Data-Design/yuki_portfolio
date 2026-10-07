@@ -13,7 +13,7 @@ export function LoginForm() {
             <div>
                 <label
                     htmlFor="email"
-                    className="block font-serif text-sm text-[#2B2119] mb-1"
+                    className="block font-serif text-sm text-text-primary mb-1"
                 >
                     Email
                 </label>
@@ -23,14 +23,14 @@ export function LoginForm() {
                     type="email"
                     required
                     autoComplete="email"
-                    className="w-full bg-transparent border border-[#2B2119]/30 px-3 py-2 font-serif text-[#2B2119] focus:outline-none focus:border-[#A6472B]"
+                    className="w-full bg-transparent border border-text-primary/30 px-3 py-2 font-serif text-text-primary focus:outline-none focus:border-accent-primary"
                 />
             </div>
 
             <div>
                 <label
                     htmlFor="password"
-                    className="block font-serif text-sm text-[#2B2119] mb-1"
+                    className="block font-serif text-sm text-text-primary mb-1"
                 >
                     Password
                 </label>
@@ -40,12 +40,12 @@ export function LoginForm() {
                     type="password"
                     required
                     autoComplete="current-password"
-                    className="w-full bg-transparent border border-[#2B2119]/30 px-3 py-2 font-serif text-[#2B2119] focus:outline-none focus:border-[#A6472B]"
+                    className="w-full bg-transparent border border-text-primary/30 px-3 py-2 font-serif text-text-primary focus:outline-none focus:border-accent-primary"
                 />
             </div>
 
             {state.error && (
-                <p className="font-serif text-sm text-[#A6472B]" role="alert">
+                <p className="font-serif text-sm text-accent-primary" role="alert">
                     {state.error}
                 </p>
             )}
@@ -53,7 +53,7 @@ export function LoginForm() {
             <button
                 type="submit"
                 disabled={pending}
-                className="w-full bg-[#A6472B] text-[#E8DEC6] font-sans font-medium py-2 px-4 disabled:opacity-60 transition-colors hover:bg-[#8C5A4E]"
+                className="w-full bg-accent-primary text-background font-sans font-medium py-2 px-4 disabled:opacity-60 transition-colors hover:bg-accent-soft"
             >
                 {pending ? "Logging in..." : "Log in"}
             </button>

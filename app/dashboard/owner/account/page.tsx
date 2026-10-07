@@ -7,10 +7,10 @@ export default async function OwnerAccountPage() {
 
     return (
         <div>
-            <p className="font-mono text-xs tracking-wide text-[#8C5A4E] mb-2">
+            <p className="font-mono text-xs tracking-wide text-accent-soft mb-2">
                 No. 002
             </p>
-            <h1 className="font-sans text-2xl font-semibold text-[#2B2119] mb-6">
+            <h1 className="font-sans text-2xl font-semibold text-text-primary mb-6">
                 Account Settings
             </h1>
 
