@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "seed:users": "tsx scripts/seed-users.ts",
+    "seed:palettes": "tsx scripts/seed-palettes",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run --config vitest.config.ts",
     "test:integration": "vitest run --config vitest.integration.config.ts",
