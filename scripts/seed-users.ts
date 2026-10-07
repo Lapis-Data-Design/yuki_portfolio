@@ -1,14 +1,14 @@
-import { config } from "dotenv";
 import { eq } from "drizzle-orm";
-
-config({ path: ".env.local" });
+import { loadScriptEnv, runScript } from "./_lib/script-env";
 
 const ACCOUNTS = [
     { email: "elysabward@gmail.com", role: "admin" as const },
     { email: "yukimdono@gmail.com", role: "owner" as const },
 ];
 
-async function seed() {
+async function seedUsers() {
+    loadScriptEnv();
+
     const { db } = await import("../db/client");
     const { users } = await import("../db/schema");
     const { hashPassword, generateTemporaryPassword } = await import("@/lib/password");
@@ -42,9 +42,4 @@ async function seed() {
     console.log("\nDone. Share each temporary password securely, then clear this terminal output.");
 }
 
-seed()
-    .then(() => process.exit(0))
-    .catch((err) => {
-        console.log(err);
-        process.exit(1);
-    })
+runScript(seedUsers);
