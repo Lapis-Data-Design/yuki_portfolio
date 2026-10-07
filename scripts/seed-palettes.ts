@@ -1,7 +1,5 @@
-import { config } from "dotenv";
 import { FALLBACK_THEME } from "../lib/theme-tokens";
-
-config({ path: ".env.local" });
+import { loadScriptEnv, runScript } from "./_lib/script-env";
 
 const ACTIVE_PALETTE = "Night City";
 
@@ -22,6 +20,8 @@ const PALETTES = [
 ]
 
 async function seedPalettes() {
+    loadScriptEnv({ allowTestBranch: true });
+
     const { db } = await import("../db/client");
     const { themePalettes } = await import("../db/schema");
     const { and, eq, sql } = await import("drizzle-orm");
@@ -66,9 +66,4 @@ async function seedPalettes() {
     
 }
 
-seedPalettes()
-    .then(() => process.exit(0))
-    .catch((error) => {
-        console.log(error);
-        process.exit(1);
-    });
+runScript(seedPalettes);
