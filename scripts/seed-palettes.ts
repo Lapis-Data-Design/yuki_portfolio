@@ -1,8 +1,7 @@
 import { config } from "dotenv";
 import { FALLBACK_THEME } from "../lib/theme-tokens";
-import { text } from "stream/consumers";
 
-config({ path: "env.local" });
+config({ path: ".env.local" });
 
 const ACTIVE_PALETTE = "Night City";
 
@@ -25,39 +24,46 @@ const PALETTES = [
 async function seedPalettes() {
     const { db } = await import("../db/client");
     const { themePalettes } = await import("../db/schema");
-    const { eq } = await import("drizzle-orm");
+    const { and, eq, sql } = await import("drizzle-orm");
 
-    await db.transaction(async (tx) => {
-        for (const palette of PALETTES) {
-            const inserted = await tx
-                .insert(themePalettes)
-                .values({ ...palette, isActive: false })
-                .onConflictDoNothing({ target: themePalettes.name })
-                .returning({ id: themePalettes.id });
+    const now = new Date();
 
-            console.log(
-                inserted.length > 0
+    const [inserted, , activated] = await db.batch([ 
+        db
+            .insert(themePalettes)
+            .values(PALETTES.map((palette) => ({ ...palette, isActive: false})))
+            .onConflictDoNothing({ target: themePalettes.name })
+            .returning({ id: themePalettes.id, name: themePalettes.name }),
+        db
+            .update(themePalettes)
+            .set({ isActive: false, updatedAt: now })
+            .where(
+                and(
+                    eq(themePalettes.isActive, true),
+                    sql`exists (select 1 from ${themePalettes} where ${themePalettes.name} = ${ACTIVE_PALETTE})`,
+                ),
+            ),
+        db
+            .update(themePalettes)
+            .set({ isActive: true, updatedAt: now })
+            .where(eq(themePalettes.name, ACTIVE_PALETTE))
+            .returning({ id: themePalettes.id, name: themePalettes.name }),
+    ]);
+
+    const insertedNames = new Set(inserted.map((row) => row.name));
+    for (const palette of PALETTES) {
+        console.log(
+            insertedNames.has(palette.name)
                 ? `Inserted palette "${palette.name}"`
                 : `Palette "${palette.name}" already exists, left unchanged`,
-            );
-        }
-        
-        await tx
-        .update(themePalettes)
-        .set({ isActive: false, updatedAt: new Date() })
-        .where(eq(themePalettes.isActive, true));
-        
-        const activated = await tx
-        .update(themePalettes)
-        .set({ isActive: true, updatedAt: new Date() })
-        .where(eq(themePalettes.name, ACTIVE_PALETTE))
-        .returning({ id: themePalettes.id });
-        
-        if (activated.length === 0) {
-            throw new Error(`Palette "${ACTIVE_PALETTE}" not found; nothing activated`);
-        }
-        console.log(`Active palette: "${ACTIVE_PALETTE}"`);
-    });
+        );
+    }
+
+    if (activated.length === 0) {
+        throw new Error(`Palette "${ACTIVE_PALETTE}" not found; nothing activated`);
+    }
+    console.log(`Active palette: "${ACTIVE_PALETTE}"`);
+    
 }
 
 seedPalettes()
