@@ -1,7 +1,7 @@
-import { inArray } from "drizzle-orm";
 import { db } from "@/db/client";
-import { users, sessions } from "@/db/schema";
+import { users } from "@/db/schema";
 import { hashPassword } from "@/lib/password";
+import { cleanupUsersByEmail } from "@/tests/helpers/user-cleanup";
 
 export const E2E_OWNER_EMAIL = "e2e-owner@example.test";
 export const E2E_OWNER_TEMP_PASSWORD = "e2e-temp-password-1";
@@ -27,16 +27,7 @@ export const ALL_TEST_EMAILS = [
 ]
 
 export async function cleanupTestAccounts(): Promise<void> {
-     const existing = await db
-        .select({ id: users.id })
-        .from(users)
-        .where(inArray(users.email, ALL_TEST_EMAILS));
-        
-    if (existing.length > 0) {
-        const ids = existing.map((u) => u.id);
-        await db.delete(sessions).where(inArray(sessions.userId, ids));
-        await db.delete(users).where(inArray(users.email, ALL_TEST_EMAILS));
-    }
+   await cleanupUsersByEmail(ALL_TEST_EMAILS);
 }
 
 export async function seedTestAccounts(): Promise<void> {
