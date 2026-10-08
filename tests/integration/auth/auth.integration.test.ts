@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "../../test-utils";
+import { describe, it, expect, beforeEach } from "@/tests/test-utils";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { users } from "@/db/schema";
@@ -12,7 +12,7 @@ import {
 import { cleanupUsersByEmailPattern } from "@/tests/helpers/user-cleanup";
 
 
-const TEST_EMAIL = "test-user-@example.test";
+const TEST_EMAIL = "test-user@example.test";
 const TEST_EMAIL_2 = "test-user-2@example.test";
 const TEST_PASSWORD = "test-password-do-not-use-elsewhere";
 
@@ -21,7 +21,7 @@ beforeEach(async () => {
     await cleanupUsersByEmailPattern("%@example.test");
 });
 
-describe("authehticateUser", () => {
+describe("authenticateUser", () => {
     it("returns the user on correct email and password", async () => {
         const passwordHash = await hashPassword(TEST_PASSWORD);
         await db.insert(users).values({
