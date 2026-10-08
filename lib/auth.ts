@@ -93,9 +93,8 @@ export async function getSession(): Promise<{
     if (!row) return null;
 
     if (row.session.expiresAt < new Date()) {
-        // Clean up expired sessoin from table
+        // Clean up expired session from table
         await db.delete(sessions).where(eq(sessions.id, token));
-        cookieStore.delete(SESSION_COOKIE);
         return null;
     }
 
