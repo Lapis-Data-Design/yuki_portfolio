@@ -41,7 +41,7 @@ export function Frame({
                     }}
                 />
             )}
-            <figcaption className="absolute bottom-2.5 right-3 font-mono text-[11px text-text-primary">
+            <figcaption className="absolute bottom-2.5 right-3 font-mono text-[11px] text-text-primary">
                 {label}
             </figcaption>
         </figure>
