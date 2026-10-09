@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { requireUser, dashboardPathFor } from "@/lib/auth";
 import { ChangePasswordForm } from "./change-password-form";
 
+export const instant = false;
+
 export default async function ChangePasswordPage() {
     const user = await requireUser();
 
