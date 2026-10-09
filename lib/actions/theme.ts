@@ -4,7 +4,7 @@ import { db } from "@/db/client";
 import { themePalettes } from "@/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { requireOwnerOrAdmin } from "@/lib/auth";
-import { revalidateTag } from "next/cache";
+import { updateTag } from "next/cache";
 import { THEME_CACHE_TAG } from "../theme-tokens";
 
 export async function activatePalette(paletteId: number) {
@@ -33,5 +33,5 @@ export async function activatePalette(paletteId: number) {
         throw new Error(`Palette ${paletteId} not found`);
     }
 
-    revalidateTag(THEME_CACHE_TAG, { expire: 0 } )
+    updateTag(THEME_CACHE_TAG);
 }

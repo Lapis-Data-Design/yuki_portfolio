@@ -1,6 +1,8 @@
 import { requireAdminOnly } from "@/lib/auth";
 import { LogoutButton } from "../../_components/logout-button";
 
+export const instant = false;
+
 const NAV_ITEMS = [
     { href: "/dashboard/admin", label: "Overview"},
     { href: "/dashboard/admin/account", label: "Account"}

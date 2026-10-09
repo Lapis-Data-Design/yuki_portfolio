@@ -1,6 +1,8 @@
 import { requireOwnerOrAdmin } from "@/lib/auth";
 import { LogoutButton } from "../../_components/logout-button";
 
+export const instant = false;
+
 const NAV_ITEMS = [
     { href: "/dashboard/owner", label: "Overview" },
     { href: "/dashboard/owner/frames", label: "Frames" },

@@ -2,6 +2,8 @@ import { requireAdminOnly } from "@/lib/auth";
 import { AccountSettingsForm } from "@/app/_components/account-settings-form";
 import { TempPasswordBanner } from "@/app/_components/temp-password-banner";
 
+export const instant = false;
+
 export default async function AdminAccountPage() {
     const user = await requireAdminOnly();
 
