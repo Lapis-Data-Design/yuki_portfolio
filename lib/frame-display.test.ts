@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { frameAlt, frameCountLabel, frameLabel, frameSrc, placeholderTone } from "./frame-display";
+import { frameAlt, frameCountLabel, frameLabel, placeholderTone } from "./frame-display";
 
 describe("frameLabel", () => {
     it("prefixes the stored digits", () => {
