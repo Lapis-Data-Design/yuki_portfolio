@@ -34,19 +34,27 @@ export const projects = pgTable("projects", {
 });
 
 export const frames = pgTable("frames", {
-    id: serial("id").primaryKey(),
-    discipline: text("discipline", { enum: discipline }).notNull(),
-    frameNumber: varchar("frame_number", { length: 32 }).notNull(),
-    rollTag: varchar("roll_tag", { length: 32 }),
-    title: text("title"),
-    caption: text("caption"),
-    imageUrl: text("image_url"),
-    streamVideoId: text("stream_video_id"),
-    projectId: integer("project_id").references(() => projects.id),
-    displayOrder: integer("display_order").notNull().default(0),
-    featuredOnHome: boolean("featured_on_home").notNull().default(false),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+        id: serial("id").primaryKey(),
+        discipline: text("discipline", { enum: discipline }).notNull(),
+        frameNumber: varchar("frame_number", { length: 32 }).notNull(),
+        rollTag: varchar("roll_tag", { length: 32 }),
+        title: text("title"),
+        caption: text("caption"),
+        imageUrl: text("image_url"),
+        streamVideoId: text("stream_video_id"),
+        projectId: integer("project_id").references(() => projects.id),
+        displayOrder: integer("display_order").notNull().default(0),
+        featuredOnHome: boolean("featured_on_home").notNull().default(false),
+        isHero: boolean("is_hero").notNull().default(false),
+        createdAt: timestamp("created_at").notNull().defaultNow(),
+    },
+    (table) => [
+        uniqueIndex("frames_discipline_frame_number_unique").on(table.discipline, table.frameNumber),
+        uniqueIndex("only_one_hero_frame")
+            .on(table.isHero)
+            .where(sql`${table.isHero} = true`),
+    ],
+);
 
 // ----- Theming ---------------------------------
 
