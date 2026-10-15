@@ -49,6 +49,7 @@ export async function getHomeFrames(): Promise<{ hero: PublicFrame | null; selec
                 .select(publicColumns)
                 .from(frames)
                 .where(and(eq(frames.featuredOnHome, true), eq(frames.isHero, false)))
+                .orderBy(asc(frames.displayOrder), asc(frames.id))
                 .limit(HOME_SELECTED_LIMIT),
         ]);
         cacheLife("max");
