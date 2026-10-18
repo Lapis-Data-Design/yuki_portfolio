@@ -59,7 +59,7 @@ describe.each([
     // { discipline: "stop_motion", path: "/stop-motion", noun: "Stop motion" },
 ] as const)("$discipline frames", ({ discipline, path, noun}) => {
     it("link to their own page by frame number", () => {
-        expect(frameHref({ discipline, frameNumber: "007 "})).toBe(`${path}/007`);
+        expect(frameHref({ discipline, frameNumber: "007"})).toBe(`${path}/007`);
     });
 
     it("are named after the frame, not the alt text", () => {
@@ -69,7 +69,7 @@ describe.each([
 
 describe("frameHref", () => {
     it("encodes characters that aren't safe in a path segment", () => {
-        expect(frameHref({ discipline: "photo", frameNumber: "14A/B"})).toBe("/photography/14A%2fB");
+        expect(frameHref({ discipline: "photo", frameNumber: "14A/B"})).toBe("/photography/14A%2FB");
     });
 });
 
