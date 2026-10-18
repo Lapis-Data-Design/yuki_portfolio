@@ -27,6 +27,9 @@ test("next and previous follow the grid order", async ({ page }) => {
     await expect(page.getByRole("heading", detailHeading("008"))).toBeVisible();
     
     await page.getByRole("link", { name: "Previous photograph" }).click();
+    await expect(page).toHaveURL(/\/photography\/007$/);
+    await expect(page.getByRole("heading", detailHeading("007"))).toBeVisible();
+
     await page.getByRole("link", { name: "Previous photograph" }).click();
     await expect(page).toHaveURL(/\/photography\/006$/);
     await expect(page.getByRole("heading", detailHeading("006"))).toBeVisible();
@@ -45,7 +48,7 @@ test("the first photo has no previous and the last has no next", async ({ page }
 });
 
 test("arrow keys step through photos and Escape returns to the contact sheet", async ({ page}) => {
-    await page.goto("/photography/007");
+    await page.goto("/photography/007", { waitUntil: "networkidle" });
     await expect(page.getByRole("heading", detailHeading("007"))).toBeVisible();
 
     await page.keyboard.press("ArrowRight");
