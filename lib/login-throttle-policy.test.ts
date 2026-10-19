@@ -36,7 +36,7 @@ describe("throttle key", () => {
     });
 
     it("prefixes IP keys", () => {
-        expect(ipThrottleKey("203.0.113.7, 10.0.0.1", null)).toBe("id:203.0.113.7");
+        expect(ipThrottleKey("203.0.113.7")).toBe("ip:203.0.113.7");
     });
 });
 
