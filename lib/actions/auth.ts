@@ -1,7 +1,16 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { authenticateUser, createSession, clearSession, dashboardPathFor } from "@/lib/auth";
+import { clearThrottle, lockedMinutes, recordLoginFailure } from "../login-throttle";
+import { 
+    INVALID_CREDENTIALS_MESSAGE,
+    clientIpFrom,
+    emailThrottleKey,
+    ipThrottleKey,
+    lockoutMessage
+} from "../login-throttle-policy";
 
 export async function loginAction(
     _prevState: { error: string | null },
@@ -14,11 +23,29 @@ export async function loginAction(
         return { error: "Email and password are required." };
     }
 
-    const user = await authenticateUser(email, password);
-    if (!user) {
-        return { error: "Invalid email or password." };
+    const requestHeaders = await headers();
+    const keys = { 
+        email: emailThrottleKey(email),
+        ip: ipThrottleKey(
+            clientIpFrom(requestHeaders.get("x-forwarded-for"), requestHeaders.get("x-real-ip"))
+        ),
+    };
+
+    const locked = await lockedMinutes([keys.email, keys.ip]);
+    if (locked !== null) {
+        return { error: lockoutMessage(locked) };
     }
 
+    const user = await authenticateUser(email, password);
+    if (!user) {
+        const nowLocked = await recordLoginFailure(keys);
+
+        return { 
+            error: nowLocked !== null ? lockoutMessage(nowLocked) : INVALID_CREDENTIALS_MESSAGE, 
+        };
+    }
+
+    await clearThrottle(keys.email);
     await createSession(user.id);
 
     if (user.mustChangePassword) {
