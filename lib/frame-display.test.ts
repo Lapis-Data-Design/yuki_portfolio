@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { assert, describe, expect, it } from "vitest";
 import { 
     findFrameInSequence,
     frameAlt,
@@ -100,12 +100,14 @@ describe("findFrameInSequence", () => {
 
     it("has no previous on the first frame", () => {
         const found = findFrameInSequence(sequence, "001");
+        assert(found, "expects frame 001 in the sequence");
         expect(found?.previous).toBeNull();
         expect(found.next).toBe(sequence[1]);
     });
 
     it("has no next on the last frame", () => {
         const found = findFrameInSequence(sequence, "003");
+        assert(found, "expected frame 003 in the sequence");
         expect(found.previous).toBe(sequence[1]);
         expect(found.next).toBeNull();
     });

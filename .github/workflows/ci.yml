@@ -10,6 +10,18 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
+    typecheck:
+        name: Tyepcheck (tsc)
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v4
+            -   uses: actions/setup-node@v4
+                with:
+                    node-version: 24
+                    cache: npm
+            -   run: npm ci
+            -   run: npm run typecheck
+
     unit:
         name: Unit tests (Vitest)
         runs-on: ubuntu-latest
@@ -27,7 +39,7 @@ jobs:
     integration:
         name: Integration tests (Vitest + Neon test branch)
         runs-on: ubuntu-latest
-        needs: unit
+        needs: [typecheck, unit]
         env:
             DATABASE_URL: ${{ secrets.NEON_TEST_DATABASE_URL }}
             NEON_BRANCH: test
@@ -56,7 +68,7 @@ jobs:
                     cache: npm
             -   run: npm ci
             -   run: npx playwright install --with-deps chromium
-            -   run: npm run test:e2e
+            -   run: npm run test:e2e:prod
             -   name: Upload Playwright report
                 if: always()
                 uses: actions/upload-artifact@v4
