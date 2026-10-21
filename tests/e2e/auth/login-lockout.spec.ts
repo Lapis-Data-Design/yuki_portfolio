@@ -33,7 +33,7 @@ const ACCOUNTS = [
 for (const account of ACCOUNTS) {
     test(`${account.role}: locked out after ${EMAIL_FAILURE_LIMIT} failures, the recovers`, async ({ page }) => {
         await test.step(`${EMAIL_FAILURE_LIMIT - 1} wrong passwords show the normal error`, async () => {
-            for (let attempt = 1; attempt < EMAIL_FAILURE_LIMIT - 1; attempt++) {
+            for (let attempt = 1; attempt < EMAIL_FAILURE_LIMIT; attempt++) {
                 await login(page, account.email, WRONG_PASSWORD);
                 await expect(page.getByText(INVALID_CREDENTIALS_MESSAGE)).toBeVisible();
             }

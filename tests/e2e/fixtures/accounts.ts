@@ -95,7 +95,7 @@ export async function seedTestAccounts(): Promise<void> {
     await db.insert(users).values({
         email: E2E_ADMIN_LOCKOUT_EMAIL,
         passwordHash: adminLockoutHash,
-        role: "owner",
+        role: "admin",
         mustChangePassword: false,
     });
 }

@@ -46,7 +46,7 @@ export function LoginForm() {
 
             {state.error && (
                 <p 
-                    className="font-serif text-sm text-accent-primary border-1-2 border-accent-primary pl-3" 
+                    className="font-serif text-sm text-text-primary border-l-2 border-accent-primary pl-3" 
                     role="alert">
                     {state.error}
                 </p>
