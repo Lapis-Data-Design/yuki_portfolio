@@ -24,6 +24,13 @@ export const sessions = pgTable("sessions", {
     createdAt: timestamp("created_at").notNull().defaultNow(),
 })
 
+export const loginThrottle = pgTable("login_throttle", {
+    key: text("key").primaryKey(),
+    failures: integer("failures").notNull().default(0),
+    windowStartedAt: timestamp("window_started_at", { withTimezone: true }).notNull().defaultNow(),
+    lockedUntil: timestamp("locked_until", { withTimezone: true }),
+})
+
 // ----- Content ---------------------------------
 
 export const projects = pgTable("projects", {
