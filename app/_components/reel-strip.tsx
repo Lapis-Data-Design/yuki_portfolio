@@ -13,7 +13,7 @@ type ReelStripProps = {
     className?: string;
 };
 
-export function ReelStrio({ frames, label, className= "" }: ReelStripProps) {
+export function ReelStrip({ frames, label, className= "" }: ReelStripProps) {
     return (
         <ol
             aria-label={label}
@@ -28,6 +28,7 @@ export function ReelStrio({ frames, label, className= "" }: ReelStripProps) {
                         src={frameSrc(frame)}
                         alt={frameAlt(frame)}
                         sizes="(min-width: 640px) 560px, 85vw"
+                        className="aspect-video"
                     />
                 </li>
             ))}
