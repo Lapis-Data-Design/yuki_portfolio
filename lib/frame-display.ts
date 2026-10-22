@@ -13,6 +13,8 @@ export type PublicFrame = {
     imageUrl: string | null;
 };
 
+type Discipline = PublicFrame["discipline"];
+
 const PLACEHOLDER_TONES: readonly FrameTone[] = [
     "accent-primary",
     "accent-secondary",
@@ -20,10 +22,10 @@ const PLACEHOLDER_TONES: readonly FrameTone[] = [
     "accent-soft",
 ];
 
-const DISCIPLINE_ROUTES: Record<PublicFrame["discipline"], {path: string, noun: string}> = {
-    photo: { path: "/photography", noun: "Photograph" },
-    video: { path: "/video", noun: "Video" },
-    stop_motion: { path: "/stop-motion", noun: "Stop motion" },
+const DISCIPLINE_ROUTES: Record<PublicFrame["discipline"], {path: string, noun: string, indexLabel: string}> = {
+    photo: { path: "/photography", noun: "Photograph", indexLabel: "photography" },
+    video: { path: "/video", noun: "Video", indexLabel: "video" },
+    stop_motion: { path: "/stop-motion", noun: "Stop motion", indexLabel: "stop motion" },
 };
 
 export function frameLabel(frame: Pick<PublicFrame, "frameNumber">): string {
@@ -55,6 +57,16 @@ export function frameLinkName(frame: Pick<PublicFrame, "discipline" | "frameNumb
     return `${DISCIPLINE_ROUTES[frame.discipline].noun} ${frameLabel(frame)}`;
 }
 
+export function disciplineIndex(discipline: Discipline ): {href: string, label: string} {
+    const route = DISCIPLINE_ROUTES[discipline];
+    return { href: route.path, label: route.indexLabel };
+}
+
+export function frameStepName(discipline: Discipline, direction: "previous" | "next"): string {
+    const noun = DISCIPLINE_ROUTES[discipline].noun.toLowerCase();
+    return `${direction === "previous" ? "Previous" : "Next"} ${noun}`;
+}
+
 export function framePositionLabel(index: number, total: number): string {
     return `${index + 1} / ${total}`;
 }
@@ -81,4 +93,11 @@ export function findFrameInSequence<T extends Pick<PublicFrame, "frameNumber">>(
         previous: frames[index - 1] ?? null,
         next: frames[index + 1] ?? null,
     };
+}
+
+export const FRAME_PARAM_PLACEHOLDER = "__placeholder__";
+
+export function frameNumberParams(frames: readonly Pick<PublicFrame, "frameNumber">[]): { frameNumber: string}[] {
+    if (frames.length === 0 ) return [{ frameNumber: FRAME_PARAM_PLACEHOLDER }];
+    return frames.map((frame) => ({ frameNumber: frame.frameNumber }));
 }
