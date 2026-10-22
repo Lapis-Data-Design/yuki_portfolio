@@ -1,12 +1,16 @@
 import { assert, describe, expect, it } from "vitest";
 import { 
+    disciplineIndex,
+    FRAME_PARAM_PLACEHOLDER,
     findFrameInSequence,
     frameAlt,
     frameCountLabel,
     frameHref,
     frameLabel,
     frameLinkName,
+    frameNumberParams,
     framePositionLabel,
+    frameStepName,
     placeholderTone
 } from "./frame-display";
 
@@ -117,5 +121,22 @@ describe("findFrameInSequence", () => {
 
     it("returns null when the list is empty", () => {
         expect(findFrameInSequence([], "001")).toBeNull();
-    })
-})
+    });
+});
+
+describe("frameNumberParams", () => {
+    it("lists every frame number in list order", () => {
+        expect(frameNumberParams([{ frameNumber: "002" }, { frameNumber: "001" }])).toEqual([
+            { frameNumber: "002" },
+            { frameNumber: "001" },
+        ]);
+    });
+
+    it("returns one placeholder param when there are no frames", () => {
+        expect(frameNumberParams([])).toEqual([{ frameNumber: FRAME_PARAM_PLACEHOLDER }]);
+    });
+
+    it("uses a placeholder that can't be a real number", () => {
+        expect(FRAME_PARAM_PLACEHOLDER).not.toMatch(/^\d+$/);
+    });
+});
