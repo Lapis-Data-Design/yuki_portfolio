@@ -4,13 +4,13 @@ import { Frame } from "@/app/_components/frame";
 import { getFramesByDiscipline } from "@/lib/frames";
 import { 
     frameAlt,
-    frameCountLabel,
     frameHref,
     frameLabel,
     frameLinkName,
     frameSrc,
     placeholderTone 
 } from "@/lib/frame-display";
+import { DisciplineHeading } from "@/app/_components/discipline-heading";
 
 export const metadata: Metadata = {
     title: "Photography",
@@ -21,14 +21,7 @@ export default async function PhotographyPage() {
 
     return (
         <>
-            <header className="mt-10 flex flex-wrap items-baseline gap-x-6 gap-y-2">
-                <h1 className="font-sans text-[clamp(2.25rem,6vw,3.25rem)] font-bold leading-none tracking-[-0.01em]">
-                    Photography
-                </h1>
-                <p className="font-mono text-[13px] text-text-primary">
-                    {frameCountLabel(photos.length)}
-                </p>
-            </header>
+            <DisciplineHeading title="Photography" count={photos.length} />
 
             {photos.length === 0 ? (
                 <p className="mt-10 max-w-[60ch]">No photographs yet.</p>
@@ -39,7 +32,7 @@ export default async function PhotographyPage() {
                             <Link
                                 href={frameHref(photo)}
                                 aria-label={frameLinkName(photo)}
-                                className="block rounded-[2px] focus-visible:outline-2 focus-visible:outline-offest-2 focus-visible:outline-accent-primary"
+                                className="block rounded-[2px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
                             >
                                 <Frame 
                                     label={frameLabel(photo)}

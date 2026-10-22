@@ -9,7 +9,6 @@ import {
     framePositionLabel,
     placeholderTone
 } from "./frame-display";
-import { discipline } from "@/db/schema";
 
 describe("frameLabel", () => {
     it("prefixes the stored digits", () => {
@@ -55,8 +54,8 @@ describe("frameCountLabel", () => {
 
 describe.each([
     { discipline: "photo", path: "/photography", noun: "Photograph" },
-    // { discipline: "video", path: "/video", noun: "Video" },
-    // { discipline: "stop_motion", path: "/stop-motion", noun: "Stop motion" },
+    { discipline: "video", path: "/video", noun: "Video" },
+    { discipline: "stop_motion", path: "/stop-motion", noun: "Stop motion" },
 ] as const)("$discipline frames", ({ discipline, path, noun}) => {
     it("link to their own page by frame number", () => {
         expect(frameHref({ discipline, frameNumber: "007"})).toBe(`${path}/007`);
