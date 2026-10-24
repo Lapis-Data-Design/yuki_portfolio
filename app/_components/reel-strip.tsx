@@ -1,7 +1,10 @@
+import Link from "next/link";
 import { Frame } from "./frame";
 import {
     frameAlt,
+    frameHref,
     frameLabel,
+    frameLinkName,
     frameSrc,
     placeholderTone,
     type PublicFrame,
@@ -22,14 +25,20 @@ export function ReelStrip({ frames, label, className= "" }: ReelStripProps) {
         >
             {frames.map((frame) => (
                 <li key={frame.id} className="w-[85vw] shrink-0 snap-start sm:w-[560px]">
-                    <Frame 
-                        label={frameLabel(frame)}
-                        tone={placeholderTone(frame.id)}
-                        src={frameSrc(frame)}
-                        alt={frameAlt(frame)}
-                        sizes="(min-width: 640px) 560px, 85vw"
-                        className="aspect-video"
-                    />
+                    <Link
+                        href={frameHref(frame)}
+                        aria-label={frameLinkName(frame)}
+                        className="block rounded-[2px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent-primary"
+                    >
+                        <Frame 
+                            label={frameLabel(frame)}
+                            tone={placeholderTone(frame.id)}
+                            src={frameSrc(frame)}
+                            alt={frameAlt(frame)}
+                            sizes="(min-width: 640px) 560px, 85vw"
+                            className="aspect-video"
+                        />
+                    </Link>
                 </li>
             ))}
         </ol>

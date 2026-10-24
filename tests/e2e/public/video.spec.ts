@@ -13,6 +13,20 @@ test("video shows the reel in order and the header count matches the strip", asy
     await expect(strip.getByText(/^No\. \d+$/)).toHaveText(SEEDED_VIDEOS);
 });
 
+test("each strip frame links to its own detail page", async ({ page }) => {
+    await page.goto("/video");
+    const strip = page.getByRole("list", { name: "Videos" });
+
+    await expect(strip.getByRole("link")).toHaveCount(SEEDED_VIDEOS.length);
+    for (const label of SEEDED_VIDEOS) {
+        const frameNumber = label.replace("No. ", "");
+        await expect(strip.getByRole("link", { name: `Video ${label}`, exact: true })).toHaveAttribute(
+            "href",
+            `/video/${frameNumber}`,
+        );
+    }
+});
+
 test.describe("on a phone", () => {
     test.use({ viewport: { width: 390, height: 844 } });
 
