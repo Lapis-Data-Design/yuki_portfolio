@@ -15,7 +15,7 @@ test("video shows the reel in order and the header count matches the strip", asy
 
 test("each strip frame links to its own detail page", async ({ page }) => {
     await page.goto("/video");
-    const strip = page.getByRole("list", { name: "Vidoes" });
+    const strip = page.getByRole("list", { name: "Videos" });
 
     await expect(strip.getByRole("link")).toHaveCount(SEEDED_VIDEOS.length);
     for (const label of SEEDED_VIDEOS) {

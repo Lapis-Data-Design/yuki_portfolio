@@ -70,9 +70,10 @@ test("the back link returns to the contact sheet", async ({ page }) => {
     await expect(page.getByRole("heading", { level: 1, name: "Photography" })).toBeVisible();
 });
 
-test("an unknown frame number is a 404", async ({ page }) => {
-    const response = await page.goto("/photography/999");
+test("an unknown frame number shows the not-found and isn't indexed", async ({ page }) => {
+    await page.goto("/photography/999");
 
-    expect(response?.status()).toBe(404);
+    await expect(page.getByText("This page could not be found.")).toBeVisible();
+    await expect(page.locator('meta[name="robots"][content*="noindex"]'));
     await expect(page.getByRole("heading", detailHeading("999"))).toHaveCount(0);
 });
