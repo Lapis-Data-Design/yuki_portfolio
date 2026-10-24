@@ -3,13 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-type PhotoKeysProps = {
+type FrameKeysProps = {
     previousHref: string | null;
     nextHref: string | null;
     backHref: string;
 };
 
-export function PhotoKeys({ previousHref, nextHref, backHref }: PhotoKeysProps) {
+export function FrameKeys({ previousHref, nextHref, backHref }: FrameKeysProps) {
     const router = useRouter();
 
     useEffect(() => {

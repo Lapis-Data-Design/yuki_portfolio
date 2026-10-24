@@ -4,7 +4,7 @@ import { and, asc, eq } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 import { db } from "@/db/client";
 import { frames } from "@/db/schema";
-import { FRAMES_CACHE_TAG, type PublicFrame } from "./frame-display";
+import { findFrameInSequence, FrameInSequence, FRAMES_CACHE_TAG, type PublicFrame } from "./frame-display";
 
 const publicColumns = {
     id: frames.id,
@@ -36,6 +36,13 @@ export async function getFramesByDiscipline(discipline: PublicFrame["discipline"
         cacheLife("minutes");
         return [];
     }
+}
+
+export async function findFrameByNumber(
+    discipline: PublicFrame["discipline"],
+    frameNumber: string,
+): Promise<FrameInSequence<PublicFrame> | null> {
+    return findFrameInSequence(await getFramesByDiscipline(discipline), frameNumber);
 }
 
 export async function getHomeFrames(): Promise<{ hero: PublicFrame | null; selected: PublicFrame[]}> {
