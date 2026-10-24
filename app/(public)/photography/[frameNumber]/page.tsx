@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Frame } from "@/app/_components/frame";
 import { FrameDetail, FrameDetailShell } from "@/app/_components/frame-detail";
 import { findFrameByNumber, getFramesByDiscipline } from "@/lib/frames";
 import {
-    findFrameInSequence,
     frameAlt,
-    frameHref,
     frameLabel,
     frameLinkName,
     frameNumberParams,
-    framePositionLabel,
     frameSrc,
     placeholderTone,
 } from "@/lib/frame-display";
