@@ -57,16 +57,25 @@ describe("frameCountLabel", () => {
 });
 
 describe.each([
-    { discipline: "photo", path: "/photography", noun: "Photograph" },
-    { discipline: "video", path: "/video", noun: "Video" },
-    { discipline: "stop_motion", path: "/stop-motion", noun: "Stop motion" },
-] as const)("$discipline frames", ({ discipline, path, noun}) => {
+    { discipline: "photo", path: "/photography", noun: "Photograph", indexLabel: "photography", stepNoun: "photograph" },
+    { discipline: "video", path: "/video", noun: "Video", indexLabel: "video", stepNoun: "video" },
+    { discipline: "stop_motion", path: "/stop-motion", noun: "Stop motion", indexLabel: "stop motion", stepNoun: "stop motion"},
+] as const)("$discipline frames", ({ discipline, path, noun, indexLabel, stepNoun}) => {
     it("link to their own page by frame number", () => {
         expect(frameHref({ discipline, frameNumber: "007"})).toBe(`${path}/007`);
     });
 
     it("are named after the frame, not the alt text", () => {
-        expect(frameLinkName({ discipline, frameNumber: "007"})).toBe(`${noun} No. 007`);
+        expect(frameLinkName({discipline, frameNumber: "007"})).toBe(`${noun} No. 007`);
+    });
+
+    it("go back to their discipline's index page", () => {
+        expect(disciplineIndex(discipline)).toEqual({ href: path, label: indexLabel})
+    });
+
+    it("name their step links after the discipline", () => {
+        expect(frameStepName(discipline, "previous")).toBe(`Previous ${stepNoun}`);
+        expect(frameStepName(discipline, "next")).toBe(`Next ${stepNoun}`)
     });
 });
 

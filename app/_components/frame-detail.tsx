@@ -1,15 +1,23 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
+import { Frame } from "./frame";
 import { FrameKeys } from "./frame-keys";
+import { findFrameByNumber } from "@/lib/frames";
 import { 
     disciplineIndex,
+    frameAlt,
     frameHref,
+    frameLabel,
     frameLinkName,
     framePositionLabel,
+    frameSrc,
     frameStepName,
+    placeholderTone,
     type FrameInSequence,
     type PublicFrame,
 } from "@/lib/frame-display";
+import { placeholder, Placeholder } from "drizzle-orm";
 
 const GRID = "mt-10 grid md:grid-cols-[10rem_1fr] md:grid-rows-[auto_1fr] md:gap-x-10";
 const DETAILS = "md:col-start-1";
@@ -34,6 +42,41 @@ export function FrameDetailShell({ discipline, mediaClassName, children }: Frame
             </Link>
             <Suspense fallback={<FrameDetailFallback mediaClassName={mediaClassName}/>}>{children}</Suspense>
         </div>
+    );
+}
+
+type FrameDetailRouteProps = {
+    discipline: PublicFrame["discipline"];
+    params: Promise<{ frameNumber: string }>;
+    mediaClassName: string;
+};
+
+export function FrameDetailRoute({ discipline, params, mediaClassName }: FrameDetailRouteProps) {
+    return (
+        <FrameDetailShell discipline={discipline} mediaClassName={mediaClassName}>
+            <PlaceholderFrameDetail discipline={discipline} params={params} mediaClassName={mediaClassName} />
+        </FrameDetailShell>
+    );
+}
+
+async function PlaceholderFrameDetail({ discipline, params, mediaClassName}: FrameDetailRouteProps) {
+    const found = await findFrameByNumber(discipline, (await params).frameNumber);
+    if (!found) notFound();
+
+    const { frame } = found;
+
+    return (
+        <FrameDetail found={found}>
+            <Frame 
+                label={frameLabel(frame)}
+                tone={placeholderTone(frame.id)}
+                src={frameSrc(frame)}
+                alt={frameAlt(frame)}
+                sizes="(min-width: 768px) 680px, 85vw"
+                priority
+                className={mediaClassName}
+            />
+        </FrameDetail>
     );
 }
 
