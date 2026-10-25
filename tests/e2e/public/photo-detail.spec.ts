@@ -74,6 +74,6 @@ test("an unknown frame number shows the not-found and isn't indexed", async ({ p
     await page.goto("/photography/999");
 
     await expect(page.getByText("This page could not be found.")).toBeVisible();
-    await expect(page.locator('meta[name="robots"][content*="noindex"]'));
+    await expect(page.locator('meta[name="robots"][content*="noindex"]').first()).toBeAttached();
     await expect(page.getByRole("heading", detailHeading("999"))).toHaveCount(0);
 });
