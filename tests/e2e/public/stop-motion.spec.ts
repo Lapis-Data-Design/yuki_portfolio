@@ -2,6 +2,11 @@ import { expect, test } from "@playwright/test";
 
 const SEEDED_CLIPS = ["001", "002", "003", "004"].map((n) => `No. ${n}`);
 
+test("stop motion page sets its tab title", async ({ page }) => {
+    await page.goto("/stop-motion");
+    await expect(page).toHaveTitle(/Stop motion/);
+});
+
 test("stop motion shows the reel in order and the header count matches the strip", async ({ page }) => {
     await page.goto("/stop-motion");
 

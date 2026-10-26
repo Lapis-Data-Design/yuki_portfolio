@@ -2,6 +2,11 @@ import { expect, test } from "@playwright/test";
 
 const SEEDED_VIDEOS = ["001", "002", "003", "004", "005", "006"].map((n)=> `No. ${n}`);
 
+test("video page sets its tab title", async ({ page }) => {
+    await page.goto("/video");
+    await expect(page).toHaveTitle(/Video/);
+});
+
 test("video shows the reel in order and the header count matches the strip", async ({ page }) => {
     await page.goto("/video");
 

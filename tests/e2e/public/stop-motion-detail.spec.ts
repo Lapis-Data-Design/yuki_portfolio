@@ -15,6 +15,7 @@ test("clicking a frame in the reel strip opens that clip", async ({ page }) => {
         .click();
 
     await expect(page).toHaveURL(/\/stop-motion\/002$/);
+    await expect(page).toHaveTitle(/Stop motion No.\ 002/);
     await expect(page.getByRole("heading", detailHeading("002"))).toBeVisible();
     await expect(page.getByText(`2 / ${TOTAL}`, { exact: true })).toBeVisible();
 });

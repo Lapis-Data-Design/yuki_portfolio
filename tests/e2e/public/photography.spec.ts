@@ -1,5 +1,10 @@
 import { expect, test } from "@playwright/test";
 
+test("photography page sets its tab title", async ({ page }) => {
+    await page.goto("/photography");
+    await expect(page).toHaveTitle(/Photography/);
+});
+
 test("photography lists numbered frames and the header count matches the grid", async ({ page}) => {
     await page.goto("/photography");
 
