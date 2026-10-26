@@ -1,9 +1,19 @@
 import { Fragment } from "react";
+import Link from "next/link";
 import { Frame } from "../_components/frame";
 import { IrisDivider } from "../_components/iris-divider";
 import { SITE } from "@/lib/site";
 import { getHomeFrames } from "@/lib/frames";
-import { frameAlt, frameLabel, frameSrc, placeholderTone } from "@/lib/frame-display";
+import { 
+    frameAlt,
+    frameHref,
+    frameLabel,
+    frameLinkName,
+    frameSrc,
+    placeholderTone
+ } from "@/lib/frame-display";
+
+ const FRAME_LINK = "block focus-visible:outline-2 focus-visible:outline-2 focus-visible:outline-accent-primary";
 
 export default async function HomePage() {
     const nameLines = SITE.name.split(" ");
@@ -32,15 +42,21 @@ export default async function HomePage() {
                 </div> 
 
                 {hero && (
-                    <Frame
-                        label={frameLabel(hero)}
-                        tone={placeholderTone(hero.id)}
-                        src={frameSrc(hero)}
-                        alt={frameAlt(hero)}
-                        priority
-                        sizes="(min-width: 768px) 520px, 100vw"
-                        className="h-[260px] md:h-[340px]"
-                    />
+                    <Link
+                        href={frameHref(hero)}
+                        aria-label={frameLinkName(hero)}
+                        className={FRAME_LINK}
+                    >
+                        <Frame
+                            label={frameLabel(hero)}
+                            tone={placeholderTone(hero.id)}
+                            src={frameSrc(hero)}
+                            alt={frameAlt(hero)}
+                            priority
+                            sizes="(min-width: 768px) 520px, 100vw"
+                            className="h-[260px] md:h-[340px]"
+                        />
+                    </Link>
                 )}
             </section>
 
@@ -51,15 +67,22 @@ export default async function HomePage() {
 
                 <section aria-label="Selected frames" className="mt-16 grid grid-cols-2 gap-3.5 md:grid-cols-4">
                     {selected.map((frame) => (
-                        <Frame 
+                        <Link
                             key={frame.id}
-                            label={frameLabel(frame)}
-                            tone={placeholderTone(frame.id)}
-                            src={frameSrc(frame)}
-                            alt={frameAlt(frame)}
-                            sizes="(min-width: 768px) 220px, 50vw"
-                            className="h-[130px]"
-                        />
+                            href={frameHref(frame)}
+                            aria-label={frameLinkName(frame)}
+                            className={FRAME_LINK}
+                        >
+                            <Frame 
+                                key={frame.id}
+                                label={frameLabel(frame)}
+                                tone={placeholderTone(frame.id)}
+                                src={frameSrc(frame)}
+                                alt={frameAlt(frame)}
+                                sizes="(min-width: 768px) 220px, 50vw"
+                                className="h-[130px]"
+                            />
+                        </Link>
                     ))}
                 </section>
             )}
