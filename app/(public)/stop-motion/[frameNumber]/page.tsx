@@ -7,7 +7,7 @@ export async function generateStaticParams() {
     return frameNumberParams(await getFramesByDiscipline("stop_motion"));
 }
 
-export async function generateMetaData({ params }: PageProps<"/stop-motion/[frameNumber]">): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps<"/stop-motion/[frameNumber]">): Promise<Metadata> {
     const found = await findFrameByNumber("stop_motion", (await params).frameNumber);
     return found ? { title: frameLinkName(found.frame) } : {};
 }

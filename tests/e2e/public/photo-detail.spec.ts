@@ -15,6 +15,7 @@ test("clicking a frame in the contact sheet opens that photo", async ({ page }) 
         .click();
 
         await expect(page).toHaveURL(/\/photography\/007$/);
+        await expect(page).toHaveTitle(/Photograph No.\ 007/);
         await expect(page.getByRole("heading", detailHeading("007"))).toBeVisible();
         await expect(page.getByText(`7 / ${TOTAL}`, { exact: true })).toBeVisible();
 });
