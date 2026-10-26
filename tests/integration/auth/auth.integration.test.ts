@@ -1,3 +1,4 @@
+import { vi } from "vitest";
 import { describe, it, expect, beforeEach } from "@/tests/test-utils";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
@@ -11,6 +12,10 @@ import {
 } from "@/lib/auth";
 import { cleanupUsersByEmailPattern } from "@/tests/helpers/user-cleanup";
 
+vi.mock("@/lib/password", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("@/lib/password")>();
+    return { ...actual, verifyPassword: vi.fn(actual.verifyPassword) };
+})
 
 const TEST_EMAIL = "test-user@example.test";
 const TEST_EMAIL_2 = "test-user-2@example.test";
@@ -54,6 +59,21 @@ describe("authenticateUser", () => {
             TEST_PASSWORD
         );
         expect(result).toBeNull();
+    });
+
+    it("runs a bcrypt compare at full cost for an email that doesn't exist", async () => {
+        const spy = vi.mocked(verifyPassword);
+        spy.mockClear();
+
+        const result = await authenticateUser("no-such-user@example.test", TEST_PASSWORD);
+
+        expect(result).toBeNull();
+        expect(spy).toHaveBeenCalledTimes(1);
+
+        const [password, dummyHash] = spy.mock.calls[0];
+        const realHash = await hashPassword(TEST_PASSWORD);
+        expect(password).toBe(TEST_PASSWORD);
+        expect(dummyHash.slice(0, 7)).toBe(realHash.slice(0, 7));
     });
 });
 
