@@ -19,6 +19,13 @@ type Role = (typeof roles)[number];
 
 // ---- Credential check (no session side effect) ------
 
+let dummyHash: Promise<string> | undefined;
+
+function getDummyHash(): Promise<string> {
+    dummyHash ??= hashPassword(randomBytes(32).toString("hex"));
+    return dummyHash;
+}
+
 export async function authenticateUser(
     email: string,
     password: string
@@ -29,12 +36,15 @@ export async function authenticateUser(
         .where(eq(users.email, email))
         .limit(1);
 
-        if (!user) return null;
+    if (!user) {
+        await verifyPassword(password, await getDummyHash());
+        return null;
+    }
 
-        const valid = await verifyPassword(password, user.passwordHash);
-        if (!valid) return null;
-        
-        return user;
+    const valid = await verifyPassword(password, user.passwordHash);
+    if (!valid) return null;
+    
+    return user;
 }
 
 // ---- Session creation / clearing ----------------------
