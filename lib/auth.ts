@@ -7,7 +7,8 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { users, sessions, type roles } from "@/db/schema";
 import { hashPassword, verifyPassword, generateTemporaryPassword } from "@/lib/password";
-import { dashboardPathFor } from "./dashboard-path";
+import { normalizeEmail } from "@/lib/email";
+import { dashboardPathFor } from "@/lib/dashboard-path";
 
 export { hashPassword, verifyPassword, generateTemporaryPassword };
 export { dashboardPathFor};
@@ -33,7 +34,7 @@ export async function authenticateUser(
     const [user] = await db
         .select()
         .from(users)
-        .where(eq(users.email, email))
+        .where(eq(users.email, normalizeEmail(email)))
         .limit(1);
 
     if (!user) {
@@ -153,18 +154,23 @@ export async function updateUserEmail(
     userId: number,
     newEmail: string
 ): Promise<{ success: true } | { success: false; error: string }> {
+    const email = normalizeEmail(newEmail);
+    if(!email) {
+        return { success: false, error: "Enter an email address." };
+    }
+
     const [existing] = await db
         .select({ id: users.id })
         .from(users)
-        .where(eq(users.email, newEmail))
+        .where(eq(users.email, email))
         .limit(1);
 
-        if (existing && existing.id !== userId) {
-            return { success: false, error: "That email is already in use." };
-        }
+    if (existing && existing.id !== userId) {
+        return { success: false, error: "That email is already in use." };
+    }
 
-        await db.update(users).set({ email: newEmail }).where(eq(users.id, userId));
-        return { success: true };
+    await db.update(users).set({ email: email }).where(eq(users.id, userId));
+    return { success: true };
 }
 
 export async function updateUserPassword(

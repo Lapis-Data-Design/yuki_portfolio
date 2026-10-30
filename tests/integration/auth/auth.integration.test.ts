@@ -41,7 +41,7 @@ async function insertUser(
 }
 
 async function findUser(id: number): Promise<UserRow> {
-    const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    const [ user ] = await db.select().from(users).where(eq(users.id, id)).limit(1);
     return user;
 }
 
@@ -62,7 +62,7 @@ describe("authenticateUser", () => {
 
         const result = await authenticateUser( ` ${TEST_EMAIL.toUpperCase()} `, TEST_PASSWORD);
         expect(result?.email).toBe(TEST_EMAIL);
-    })
+    });
     
     it("returns null on an incorrect password", async () => {
         await insertUser(TEST_EMAIL);
@@ -106,7 +106,7 @@ describe("updateUserEmail", () => {
     it("fails when the new email is already in use by someone", async () => {
         const userA = await insertUser(TEST_EMAIL);
         
-        await insertUser(TEST_EMAIL);
+        await insertUser(TEST_EMAIL_2, { role: "admin" });
 
         const result = await updateUserEmail(userA.id, TEST_EMAIL_2);
         expect(result.success).toBe(false);
@@ -140,7 +140,7 @@ describe("updateUserEmail", () => {
 
 describe("updateUserPassword", () => {
     it("succeeds with the correct current password and a valid new one", async () => {
-        const user = await insertUser(TEST_EMAIL);
+        const user = await insertUser(TEST_EMAIL, {mustChangePassword: true });
         
         const result = await updateUserPassword(
             user.id,

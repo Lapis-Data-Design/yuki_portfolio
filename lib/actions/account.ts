@@ -7,6 +7,7 @@ import {
     updateUserEmail,
     updateUserPassword,
 } from "@/lib/auth";
+import { normalizeEmail } from "@/lib/email";
 
 type AccountFormState = {
     success: boolean;
@@ -35,7 +36,7 @@ export async function updateAccountAction(
     let emailChanged = false;
     let passwordChanged  = false;
 
-    if (typeof newEmail === "string" && newEmail && newEmail !== user.email) {
+    if (typeof newEmail === "string" && newEmail.trim() && normalizeEmail(newEmail) !== user.email) {
         const result = await updateUserEmail(user.id, newEmail);
         if (!result.success) {
             return { success: false, error: result.error }
