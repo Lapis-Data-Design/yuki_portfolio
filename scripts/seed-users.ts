@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { loadScriptEnv, runScript } from "./_lib/script-env";
+import { normalizeEmail } from "@/lib/email";
 
 const ACCOUNTS = [
     { email: "elysabward@gmail.com", role: "admin" as const },
@@ -14,14 +15,16 @@ async function seedUsers() {
     const { hashPassword, generateTemporaryPassword } = await import("@/lib/password");
 
     for (const account of ACCOUNTS) {
+        const email = normalizeEmail(account.email);
+
         const [existing] = await db
             .select({ id: users.id })
             .from(users)
-            .where(eq(users.email, account.email))
+            .where(eq(users.email, email))
             .limit(1);
 
         if (existing) {
-            console.log(`Skipped ${account.email} - already exists.`);
+            console.log(`Skipped ${email} - already exists.`);
             continue;
         }
 
@@ -29,13 +32,13 @@ async function seedUsers() {
         const passwordHash = await hashPassword(tempPassword);
 
         await db.insert(users).values({
-            email: account.email,
+            email: email,
             passwordHash,
             role: account.role,
             mustChangePassword: true,
         });
 
-        console.log(`Created ${account.role}: ${account.email}`);
+        console.log(`Created ${account.role}: ${email}`);
         console.log(`   Temporary password: ${tempPassword}`);
     }
 

@@ -1,3 +1,5 @@
+import { normalizeEmail } from "./email";
+
 export const LOGIN_WINDOW_MINUTES = 15;
 export const LOGIN_LOCK_MINUTES = 15;
 
@@ -5,10 +7,6 @@ export const EMAIL_FAILURE_LIMIT = 5;
 export const IP_FAILURE_LIMIT = 20;
 
 export const INVALID_CREDENTIALS_MESSAGE = "Invalid email or password.";
-
-export function normalizeEmail(email: string): string {
-    return email.trim().toLowerCase();
-}
 
 export function emailThrottleKey(email: string): string {
     return `email:${normalizeEmail(email)}`;

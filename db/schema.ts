@@ -8,28 +8,33 @@ export const discipline = ["photo", "video", "stop_motion"] as const;
 
 // ----- Auth ------------------------------------
 
-export const users = pgTable("users", {
-    id: serial("id").primaryKey(),
-    email: text("email").notNull().unique(),
-    passwordHash: text("password_hash").notNull(),
-    role: text("role", { enum: roles }).notNull(),
-    mustChangePassword: boolean("must_change_password").notNull().default(true),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-})
+export const users = pgTable(
+    "users", {
+        id: serial("id").primaryKey(),
+        email: text("email").notNull().unique(),
+        passwordHash: text("password_hash").notNull(),
+        role: text("role", { enum: roles }).notNull(),
+        mustChangePassword: boolean("must_change_password").notNull().default(true),
+        createdAt: timestamp("created_at").notNull().defaultNow(),
+    },
+    (table) => [
+        check("users_email_normalized", sql`${table.email} = lower(btrim(${table.email}))`),
+    ]
+);
 
 export const sessions = pgTable("sessions", {
     id: varchar("id", { length: 255 }).primaryKey(), // session token
     userId: integer("user_id").notNull().references(() => users.id ),
     expiresAt: timestamp("expires_at").notNull(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
-})
+});
 
 export const loginThrottle = pgTable("login_throttle", {
     key: text("key").primaryKey(),
     failures: integer("failures").notNull().default(0),
     windowStartedAt: timestamp("window_started_at", { withTimezone: true }).notNull().defaultNow(),
     lockedUntil: timestamp("locked_until", { withTimezone: true }),
-})
+});
 
 // ----- Content ---------------------------------
 
