@@ -174,3 +174,15 @@ describe("updateUserPassword", () => {
         expect(result.success).toBe(false);
     });
 });
+
+describe("users table", () => {
+    it("rejects an email that isn't trimmed and lowercase", async () => {
+        const error = await insertUser("Mixed-Case@example.test").then(
+            () => null,
+            (e: unknown) => e
+        );
+
+        expect(error).toBeInstanceOf(Error);
+        expect((error as Error).cause).toMatchObject({ constraint: "users_email_normalized" });
+    })
+})
