@@ -15,12 +15,35 @@ import { cleanupUsersByEmailPattern } from "@/tests/helpers/user-cleanup";
 vi.mock("@/lib/password", async (importOriginal) => {
     const actual = await importOriginal<typeof import("@/lib/password")>();
     return { ...actual, verifyPassword: vi.fn(actual.verifyPassword) };
-})
+});
 
 const TEST_EMAIL = "test-user@example.test";
 const TEST_EMAIL_2 = "test-user-2@example.test";
 const TEST_PASSWORD = "test-password-do-not-use-elsewhere";
 
+type UserRow = typeof users.$inferSelect;
+
+let testPasswordHash: Promise<string> | undefined;
+
+async function insertUser(
+    email: string, 
+    {
+        role = "owner",
+        mustChangePassword = false,
+    }: { role?: UserRow["role"]; mustChangePassword?: boolean } = {}
+): Promise<UserRow> {
+    testPasswordHash ??= hashPassword(TEST_PASSWORD);
+    const [ user ] = await db
+        .insert(users)
+        .values({ email, passwordHash: await testPasswordHash, role, mustChangePassword })
+        .returning();
+    return user;
+}
+
+async function findUser(id: number): Promise<UserRow> {
+    const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return user;
+}
 
 beforeEach(async () => {
     await cleanupUsersByEmailPattern("%@example.test");
@@ -28,36 +51,28 @@ beforeEach(async () => {
 
 describe("authenticateUser", () => {
     it("returns the user on correct email and password", async () => {
-        const passwordHash = await hashPassword(TEST_PASSWORD);
-        await db.insert(users).values({
-            email: TEST_EMAIL,
-            passwordHash,
-            role: "owner",
-            mustChangePassword: false,
-        });
+        await insertUser(TEST_EMAIL);
 
         const result = await authenticateUser(TEST_EMAIL, TEST_PASSWORD);
         expect(result).not.toBeNull();
     });
+
+    it("matches an email typed with different case and surrounding spaces", async () => {
+        await insertUser(TEST_EMAIL);
+
+        const result = await authenticateUser( ` ${TEST_EMAIL.toUpperCase()} `, TEST_PASSWORD);
+        expect(result?.email).toBe(TEST_EMAIL);
+    })
     
     it("returns null on an incorrect password", async () => {
-        const passwordHash = await hashPassword(TEST_PASSWORD);
-        await db.insert(users).values({
-            email: TEST_EMAIL,
-            passwordHash,
-            role: "owner",
-            mustChangePassword: false,
-        });
+        await insertUser(TEST_EMAIL);
 
         const result = await authenticateUser(TEST_EMAIL, "wrong-password");
         expect(result).toBeNull();
     });
 
     it("returns null for an email that doesn't exist", async () => {
-        const result = await authenticateUser(
-            "no-such-user@example.test",
-            TEST_PASSWORD
-        );
+        const result = await authenticateUser( "no-such-user@example.test", TEST_PASSWORD );
         expect(result).toBeNull();
     });
 
@@ -79,64 +94,53 @@ describe("authenticateUser", () => {
 
 describe("updateUserEmail", () => {
     it("updates the email when the new address is unused", async () => {
-        const passwordHash = await hashPassword(TEST_PASSWORD);
-        const [user] = await db
-            .insert(users)
-            .values({
-                email: TEST_EMAIL,
-                passwordHash,
-                role: "owner",
-                mustChangePassword: false,
-            })
-            .returning();
+        const user = await insertUser(TEST_EMAIL);
 
-            const result = await updateUserEmail(user.id, TEST_EMAIL_2);
-            expect(result.success).toBe(true);
+        const result = await updateUserEmail(user.id, TEST_EMAIL_2);
+        expect(result.success).toBe(true);
 
-            const [updated] = await db
-                .select()
-                .from(users)
-                .where(eq(users.id, user.id))
-                .limit(1);
-            expect(updated.email).toBe(TEST_EMAIL_2);
+        const updated = await findUser(user.id);
+        expect(updated.email).toBe(TEST_EMAIL_2);
     });
 
     it("fails when the new email is already in use by someone", async () => {
-        const passwordHash = await hashPassword(TEST_PASSWORD);
-        const [userA] = await db
-            .insert(users)
-            .values({
-                email: TEST_EMAIL,
-                passwordHash,
-                role: "owner",
-                mustChangePassword: false,
-            })
-            .returning();
+        const userA = await insertUser(TEST_EMAIL);
         
-        await db.insert(users).values({
-            email: TEST_EMAIL_2,
-            passwordHash,
-            role: "admin",
-            mustChangePassword: false,
-        });
+        await insertUser(TEST_EMAIL);
 
         const result = await updateUserEmail(userA.id, TEST_EMAIL_2);
+        expect(result.success).toBe(false);
+    });
+
+    it("stores the new email trimmed and lowercased", async () => {
+        const user = await insertUser(TEST_EMAIL);
+        
+        const result = await updateUserEmail(user.id, `  ${TEST_EMAIL_2.toUpperCase()}  `);
+        expect(result.success).toBe(true);
+
+        const updated = await findUser(user.id);
+        expect(updated.email).toBe(TEST_EMAIL_2);
+    });
+
+    it("fails when the new email matches one in use except for case", async () => {
+        const userA = await insertUser(TEST_EMAIL);
+        await insertUser(TEST_EMAIL_2);
+
+        const result = await updateUserEmail(userA.id, TEST_EMAIL_2.toUpperCase());
+        expect(result.success).toBe(false);
+    });
+
+    it("fails when the new email is empty after trimming", async () => {
+        const user = await insertUser(TEST_EMAIL);
+
+        const result = await updateUserEmail(user.id, "    ");
         expect(result.success).toBe(false);
     });
 });
 
 describe("updateUserPassword", () => {
     it("succeeds with the correct current password and a valid new one", async () => {
-        const passwordHash = await hashPassword(TEST_PASSWORD);
-        const [user] = await db
-            .insert(users)
-            .values({
-                email: TEST_EMAIL,
-                passwordHash,
-                role: "owner",
-                mustChangePassword: true,
-            })
-            .returning();
+        const user = await insertUser(TEST_EMAIL);
         
         const result = await updateUserPassword(
             user.id,
@@ -145,12 +149,7 @@ describe("updateUserPassword", () => {
         );
         expect(result.success).toBe(true);
 
-        const [updated] = await db
-            .select()
-            .from(users)
-            .where(eq(users.id, user.id))
-            .limit(1);
-
+        const updated = await findUser(user.id);
         expect(updated.mustChangePassword).toBe(false);
         expect( 
             await verifyPassword("a-new-valid-password", updated.passwordHash)
@@ -158,16 +157,7 @@ describe("updateUserPassword", () => {
     });
 
     it("fails when the current password is wrong", async () => {
-        const passwordHash = await hashPassword(TEST_PASSWORD);
-        const [user] = await db
-            .insert(users)
-            .values({
-                email: TEST_EMAIL,
-                passwordHash,
-                role: "owner",
-                mustChangePassword: true,
-            })
-            .returning();
+        const user = await insertUser(TEST_EMAIL, { mustChangePassword: true });
 
         const result = await updateUserPassword(
             user.id,
@@ -178,16 +168,7 @@ describe("updateUserPassword", () => {
     });
 
     it("fails when the new password is under 8 characters", async () => {
-        const passwordHash = await hashPassword(TEST_PASSWORD);
-        const [user] = await db
-            .insert(users)
-            .values({
-                email: TEST_EMAIL,
-                passwordHash,
-                role: "owner",
-                mustChangePassword: true,
-            })
-            .returning();
+        const user = await insertUser(TEST_EMAIL, { mustChangePassword: true });
 
         const result = await updateUserPassword(user.id, TEST_PASSWORD, "short");
         expect(result.success).toBe(false);
