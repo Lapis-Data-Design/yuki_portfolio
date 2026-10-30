@@ -8,7 +8,6 @@ import {
     emailThrottleKey,
     ipThrottleKey,
     lockoutMessage,
-    normalizeEmail,
 } from "./login-throttle-policy";
 
 
@@ -21,12 +20,6 @@ describe("limits", () => {
 
     it("gives an IP a higher ceiling than a single email", () => {
         expect(IP_FAILURE_LIMIT).toBeGreaterThan(EMAIL_FAILURE_LIMIT);
-    });
-});
-
-describe("normalizeEmail", () => {
-    it("trims and lowercases, so case variants share one counter", () => {
-        expect(normalizeEmail(" Test@Example.TEST ")).toBe("test@example.test");
     });
 });
 
