@@ -1,31 +1,28 @@
 import { test, expect } from "@playwright/test";
 import { login, logout } from "../fixtures/auth-actions";
-import {
-    E2E_OWNER_LOCKOUT_EMAIL,
-    E2E_OWNER_LOCKOUT_PASSWORD,
-    E2E_ADMIN_LOCKOUT_EMAIL,
-    E2E_ADMIN_LOCKOUT_PASSWORD,
-} from "../fixtures/accounts";
+import { TEST_ACCOUNTS } from "../fixtures/accounts";
 import { rewindLoginThrottleForEmail } from "@/tests/helpers/login-throttle";
 import {
     EMAIL_FAILURE_LIMIT,
     INVALID_CREDENTIALS_MESSAGE,
 } from "@/lib/login-throttle-policy";
 
+const OWNER_LOCKOUT_TEST_ACCOUNT = TEST_ACCOUNTS.ownerLockout;
+const ADMIN_LOCKOUT_TEST_ACCOUNT = TEST_ACCOUNTS.adminLockout;
 const WRONG_PASSWORD = "definitely-not-the-password";
 const LOCKOUT_MESSAGE = /^Too many attempts\. Try again in \d+ minutes?\.$/;
 
 const ACCOUNTS = [
     {
         role: "owner",
-        email: E2E_OWNER_LOCKOUT_EMAIL,
-        password: E2E_OWNER_LOCKOUT_PASSWORD,
+        email: OWNER_LOCKOUT_TEST_ACCOUNT.email,
+        password: OWNER_LOCKOUT_TEST_ACCOUNT.password,
         dashboard: "/dashboard/owner",
     },
     {
         role: "admin",
-        email: E2E_ADMIN_LOCKOUT_EMAIL,
-        password: E2E_ADMIN_LOCKOUT_PASSWORD,
+        email: ADMIN_LOCKOUT_TEST_ACCOUNT.email,
+        password: ADMIN_LOCKOUT_TEST_ACCOUNT.password,
         dashboard: "/dashboard/admin",
     },
 ] as const;

@@ -4,98 +4,35 @@ import { hashPassword } from "@/lib/password";
 import { cleanupUsersByEmail } from "@/tests/helpers/user-cleanup";
 import { clearAllLoginThrottle } from "@/tests/helpers/login-throttle";
 
-export const E2E_OWNER_EMAIL = "e2e-owner@example.test";
-export const E2E_OWNER_TEMP_PASSWORD = "e2e-temp-password-1";
+type TestAccount = {
+    email: string;
+    password: string;
+    role: (typeof users.$inferInsert)["role"];
+    mustChangePassword: boolean;
+};
 
-export const E2E_ADMIN_EMAIL = "e2e-admin@example.test";
-export const E2E_ADMIN_TEMP_PASSWORD = "e2e-temp-password-2";
-
-export const E2E_ROLE_TEST_OWNER_EMAIL = "e2e-role-owner@example.test";
-export const E2E_ROLE_TEST_OWNER_PASSWORD = "e2e-role-owner-password-3";
-
-export const E2E_ADMIN_JOURNEY_EMAIL = "e2e-admin-journey@example.test";
-export const E2E_ADMIN_JOURNEY_TEMP_PASSWORD = "e2e-admin-journey-temp-4";
-
-export const E2E_EXPIRED_SESSION_EMAIL = "e2e-exipred-session@example.test";
-export const E2E_EXPIRED_SESSION_PASSWORD = "e2e-expired-session-password-5";
-
-export const E2E_OWNER_LOCKOUT_EMAIL = "e2e-owner-lockout@example.test";
-export const E2E_OWNER_LOCKOUT_PASSWORD = "e2e-owner-lockout-password-6";
-
-export const E2E_ADMIN_LOCKOUT_EMAIL = "e2e-admin-lockout@example.test";
-export const E2E_ADMIN_LOCKOUT_PASSWORD = "e2e-admin-lockout-password-7";
-
-export const ALL_TEST_EMAILS = [
-    E2E_OWNER_EMAIL,
-    E2E_ADMIN_EMAIL,
-    E2E_ROLE_TEST_OWNER_EMAIL,
-    E2E_ADMIN_JOURNEY_EMAIL,
-    E2E_EXPIRED_SESSION_EMAIL,
-    E2E_OWNER_LOCKOUT_EMAIL,
-    E2E_ADMIN_LOCKOUT_EMAIL,
-]
+export const TEST_ACCOUNTS = {
+    owner:          { email: "e2e-owner@example.test",              password: "e2e-temp-password-1",                role: "owner",  mustChangePassword: true },
+    admin:          { email: "e2e-admin@example.test",              password: "e2e-temp-password-2",                role: "admin",  mustChangePassword: false },
+    roleTestOwner:  { email: "e2e-role-owner@example.test",         password: "e2e-role-owner-password-3",          role: "owner",  mustChangePassword: false },
+    adminJourney:   { email: "e2e-admin-journey@example.test",      password: "e2e-admin-journey-temp-password-4",  role: "admin",  mustChangePassword: true },
+    expiredSession: { email: "e2e-expired-session@example.test",    password: "e2e-expired-session-password-5",     role: "owner",  mustChangePassword: false },
+    ownerLockout:   { email: "e2e-owner-lockout@example.test",      password: "e2e-owner-lockout-password-6",       role: "owner",  mustChangePassword: false },
+    adminLockout:   { email: "e2e-admin-lockout@example.test",      password: "e2e-admin-lockout-password-7",       role: "admin",  mustChangePassword: false },
+} satisfies Record<string, TestAccount>;
 
 export async function cleanupTestAccounts(): Promise<void> {
-   await cleanupUsersByEmail(ALL_TEST_EMAILS);
+   await cleanupUsersByEmail(Object.values(TEST_ACCOUNTS).map((account) => account.email));
    await clearAllLoginThrottle();
 }
 
 export async function seedTestAccounts(): Promise<void> {
     await cleanupTestAccounts();
 
-    const ownerHash = await hashPassword(E2E_OWNER_TEMP_PASSWORD);
-    await db.insert(users).values({
-        email: E2E_OWNER_EMAIL,
-        passwordHash: ownerHash,
-        role: "owner",
-        mustChangePassword: true,
-    });
+    const rows: (typeof users.$inferInsert)[] = [];
+    for (const { password, ...account } of Object.values(TEST_ACCOUNTS)) {
+        rows.push({ ...account, passwordHash: await hashPassword(password) });
+    }
 
-    const adminHash = await hashPassword(E2E_ADMIN_TEMP_PASSWORD);
-    await db.insert(users).values({
-        email: E2E_ADMIN_EMAIL,
-        passwordHash: adminHash,
-        role: "admin",
-        mustChangePassword: false,
-    });
-
-    const roleTestOwnerHash = await hashPassword(E2E_ROLE_TEST_OWNER_PASSWORD);
-    await db.insert(users).values({
-        email: E2E_ROLE_TEST_OWNER_EMAIL,
-        passwordHash: roleTestOwnerHash,
-        role: "owner",
-        mustChangePassword: false,
-    });
-
-    const adminJourneyHash = await hashPassword(E2E_ADMIN_JOURNEY_TEMP_PASSWORD);
-    await db.insert(users).values({
-        email: E2E_ADMIN_JOURNEY_EMAIL,
-        passwordHash: adminJourneyHash,
-        role: "admin",
-        mustChangePassword: true,
-    });
-
-    const expiredSessionHash = await hashPassword(E2E_EXPIRED_SESSION_PASSWORD);
-    await db.insert(users).values({
-        email: E2E_EXPIRED_SESSION_EMAIL,
-        passwordHash: expiredSessionHash,
-        role: "owner",
-        mustChangePassword: false,
-    });
-
-    const ownerLockoutHash = await hashPassword(E2E_OWNER_LOCKOUT_PASSWORD);
-    await db.insert(users).values({
-        email: E2E_OWNER_LOCKOUT_EMAIL,
-        passwordHash: ownerLockoutHash,
-        role: "owner",
-        mustChangePassword: false,
-    });
-
-    const adminLockoutHash = await hashPassword(E2E_ADMIN_LOCKOUT_PASSWORD);
-    await db.insert(users).values({
-        email: E2E_ADMIN_LOCKOUT_EMAIL,
-        passwordHash: adminLockoutHash,
-        role: "admin",
-        mustChangePassword: false,
-    });
+    await db.insert(users).values(rows);
 }

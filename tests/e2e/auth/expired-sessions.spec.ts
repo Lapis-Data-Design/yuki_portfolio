@@ -1,13 +1,15 @@
 import { test, expect } from "@playwright/test";
-import { E2E_EXPIRED_SESSION_EMAIL } from "../fixtures/accounts";
+import { TEST_ACCOUNTS } from "../fixtures/accounts";
 import { 
     SESSION_COOKIE_NAME,
     createExpiredSession,
     sessionExists
  } from "@/tests/helpers/sessions";
 
+ const EXPIRED_SESSION_TEST_ACCOUNT = TEST_ACCOUNTS.expiredSession;
+
  test("expired session cookie redirects to login instead of crashing", async ({ page, context, baseURL }) => {
-    const token = await createExpiredSession(E2E_EXPIRED_SESSION_EMAIL);
+    const token = await createExpiredSession(EXPIRED_SESSION_TEST_ACCOUNT.email);
 
     await context.addCookies([
         {
