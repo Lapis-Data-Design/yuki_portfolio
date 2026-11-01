@@ -13,7 +13,7 @@ import {
     placeholderTone
  } from "@/lib/frame-display";
 
- const FRAME_LINK = "block focus-visible:outline-2 focus-visible:outline-2 focus-visible:outline-accent-primary";
+ const FRAME_LINK = "block focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary";
 
 export default async function HomePage() {
     const nameLines = SITE.name.split(" ");
