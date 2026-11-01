@@ -1,15 +1,13 @@
 import { test, expect} from "@playwright/test";
 import { login, logout } from "../fixtures/auth-actions";
-import { 
-    E2E_ADMIN_JOURNEY_EMAIL,
-    E2E_ADMIN_JOURNEY_TEMP_PASSWORD
-} from "../fixtures/accounts";
+import { TEST_ACCOUNTS } from "../fixtures/accounts";
 
+const ADMIN_JOURNEY_TEST_ACCOUNT = TEST_ACCOUNTS.adminJourney;
 const NEW_PASSWORD = "e2e-admin-new-password";
 
 test("admin: full auth journey from temp password to logout", async ({ page }) => {
     await test.step("logs in with temp password and is redirected to change-password", async () => {
-        await login(page, E2E_ADMIN_JOURNEY_EMAIL, E2E_ADMIN_JOURNEY_TEMP_PASSWORD);
+        await login(page, ADMIN_JOURNEY_TEST_ACCOUNT.email, ADMIN_JOURNEY_TEST_ACCOUNT.password);
         await expect(page).toHaveURL(/\/change-password/);
     });
 
@@ -20,14 +18,14 @@ test("admin: full auth journey from temp password to logout", async ({ page }) =
 
     await test.step("log out, log back in with temp password -> still change-password (skip didn't clear the flag)", async () => {
         await logout(page);
-        await login(page, E2E_ADMIN_JOURNEY_EMAIL, E2E_ADMIN_JOURNEY_TEMP_PASSWORD);
+        await login(page, ADMIN_JOURNEY_TEST_ACCOUNT.email, ADMIN_JOURNEY_TEST_ACCOUNT.password);
         await expect(page).toHaveURL(/\/change-password/);
     });
 
     await test.step("complete the form -> redirected to admin dashboard", async () => {
         await page
             .getByLabel("Current (temporary) password")
-            .fill(E2E_ADMIN_JOURNEY_TEMP_PASSWORD);
+            .fill(ADMIN_JOURNEY_TEST_ACCOUNT.password);
         await page.getByLabel("New Password").fill(NEW_PASSWORD);
         await page.getByRole("button", { name: "Set password"}).click();
         await expect(page).toHaveURL("/dashboard/admin");
@@ -40,7 +38,7 @@ test("admin: full auth journey from temp password to logout", async ({ page }) =
 
     await test.step("log out, log back in with the NEW password -> straight to dashboard, no detour", async () => {
         await logout(page);
-        await login(page, E2E_ADMIN_JOURNEY_EMAIL, NEW_PASSWORD);
+        await login(page, ADMIN_JOURNEY_TEST_ACCOUNT.email, NEW_PASSWORD);
         await expect(page).toHaveURL("/dashboard/admin");
 
     });
