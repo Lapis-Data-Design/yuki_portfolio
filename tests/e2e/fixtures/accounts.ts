@@ -19,11 +19,12 @@ export const TEST_ACCOUNTS = {
     expiredSession: { email: "e2e-expired-session@example.test",    password: "e2e-expired-session-password-5",     role: "owner",  mustChangePassword: false },
     ownerLockout:   { email: "e2e-owner-lockout@example.test",      password: "e2e-owner-lockout-password-6",       role: "owner",  mustChangePassword: false },
     adminLockout:   { email: "e2e-admin-lockout@example.test",      password: "e2e-admin-lockout-password-7",       role: "admin",  mustChangePassword: false },
+    ownerOverview:  { email: "e2e-owner-overview@example.test",     password: "e2e-owner-overview-password-8",      role: "owner",  mustChangePassword: false },
 } satisfies Record<string, TestAccount>;
 
 export async function cleanupTestAccounts(): Promise<void> {
-   await cleanupUsersByEmail(Object.values(TEST_ACCOUNTS).map((account) => account.email));
-   await clearAllLoginThrottle();
+    await cleanupUsersByEmail(Object.values(TEST_ACCOUNTS).map((account) => account.email));
+    await clearAllLoginThrottle();
 }
 
 export async function seedTestAccounts(): Promise<void> {
