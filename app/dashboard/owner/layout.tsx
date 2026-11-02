@@ -5,9 +5,6 @@ export const instant = false;
 
 const NAV_ITEMS = [
     { href: "/dashboard/owner", label: "Overview" },
-    { href: "/dashboard/owner/frames", label: "Frames" },
-    { href: "/dashboard/owner/palettes", label: "Palettes" },
-    { href: "/dashboard/owner/projects", label: "Projects" },
     { href: "/dashboard/owner/account", label: "Account"}
 ] as const;
 
