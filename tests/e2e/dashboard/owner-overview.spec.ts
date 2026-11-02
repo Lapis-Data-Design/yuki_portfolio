@@ -5,7 +5,7 @@ import { login } from "../fixtures/auth-actions";
 const ACTIVE_PALETTE = "Night City";
 
 const HOME_FRAMES = [
-    { name: "Photography No. 001", href: "/photography/001" },
+    { name: "Photograph No. 001", href: "/photography/001" },
     { name: "Stop motion No. 002", href: "/stop-motion/002" },
     { name: "Video No. 003", href: "/video/003" },
     { name: "Video No. 005", href: "/video/005" },
