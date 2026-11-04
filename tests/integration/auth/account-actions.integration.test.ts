@@ -9,7 +9,10 @@ import {
     EMAIL_MISMATCH_MESSAGE,
     SAME_PASSWORD_MESSAGE,
     SAME_EMAIL_MESSAGE,
-} from "@/lib/account-form";
+    CURRENT_PASSWORD_REQUIRED_MESSAGE,
+    NEW_EMAIL_REQUIRED_MESSAGE,
+    NEW_PASSWORD_REQUIRED_MESSAGE,
+} from "@/lib/account-rules";
 import { updateEmailAction, updatePasswordAction } from "@/lib/actions/account";
 import { revalidatePath } from "next/cache";
 
@@ -78,11 +81,11 @@ describe("updateEmailAction", () => {
     }
 
     it("requires the current password", async () => {
-        await expectRefused({ ...valid, currentPassword: "" }, "Current password is required to make changes.");
+        await expectRefused({ ...valid, currentPassword: "" }, CURRENT_PASSWORD_REQUIRED_MESSAGE);
     });
 
     it("requires a new email", async () => {
-        await expectRefused({ ...valid, newEmail: " ", confirmNewEmail: "  "}, "Enter a new email address.");
+        await expectRefused({ ...valid, newEmail: " ", confirmNewEmail: "  "}, NEW_EMAIL_REQUIRED_MESSAGE);
     });
 
     it("refuses new emails that don't match", async () => {
@@ -128,7 +131,7 @@ describe("updatePasswordAction", () => {
     });
 
     it("requires a new password", async () => {
-        await expectRefused({ ...valid, newPassword: "", confirmNewPassword: "" }, "Enter a new password.");
+        await expectRefused({ ...valid, newPassword: "", confirmNewPassword: "" }, NEW_PASSWORD_REQUIRED_MESSAGE);
     });
 
     it("refuses new passwords that don't match", async () => {
