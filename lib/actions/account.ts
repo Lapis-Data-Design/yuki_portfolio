@@ -15,7 +15,7 @@ import {
     SAME_PASSWORD_MESSAGE
 } from "@/lib/account-rules";
 
-type AccountActionState = {
+export type AccountActionState = {
     success: boolean;
     error: string | null;
 }

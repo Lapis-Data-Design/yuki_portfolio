@@ -1,15 +1,22 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { updateAccountAction } from "@/lib/actions/account";
+import { updatePasswordAction, type AccountActionState } from "@/lib/actions/account";
+import { PASSWORD_MISMATCH_MESSAGE } from "@/lib/account-rules";
+import { canSavePassword, showMismatch } from "@/lib/account-form";
+import { Field, FormResult, SubmitButton } from "@/app/_components/form-fields";
 
-const initialState = { error: null as string | null, success: false };
+const initialState: AccountActionState = { success: false, error: null };
 
 export function ChangePasswordForm({ dashboardPath}: { dashboardPath: string }) {
-    const [state, formAction, pending] = useActionState(updateAccountAction, initialState);
+    const [state, formAction, pending] = useActionState(updatePasswordAction, initialState);
     const router = useRouter();
+
+    const [currentPassword, setCurrentPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmNewPassword, setConfirmNewPassword] = useState(""); 
 
     useEffect(() => {
         if (state.success) {
@@ -17,58 +24,55 @@ export function ChangePasswordForm({ dashboardPath}: { dashboardPath: string }) 
         }
     }, [state.success, dashboardPath, router]);
 
-    return (
+    const mismatch = showMismatch(newPassword, confirmNewPassword);
+    const ready = canSavePassword({ currentPassword, newPassword, confirmNewPassword });
+
+    return(
         <form action={formAction} className="space-y-5">
-            <div>
-                <label htmlFor="currentPassword" className="block font-serif text-sm text-text-primary mb-1">
-                    Current (temporary) password
-                </label>
-                <input 
-                    id="currentPassword"
-                    name="currentPassword"
-                    type="password"
-                    required
-                    autoComplete="current-password"
-                    className="w-full bg-transparent border border-text-primary/30 px-3 py-2 font-serif text-text-primary focus:outline-none focus:border-accent-primary"
-                />
-            </div>
-
-            <div>
-                <label htmlFor="newPassword" className="block font-serif text-sm text-text-primary mb-1">
-                    New Password
-                </label>
-                <input 
-                    id="newPassword"
-                    name="newPassword"
-                    type="password"
-                    required
-                    autoComplete="new-password"
-                    className="w-full bg-transparent border border-text-primary/30 px-3 py-2 font-serif text-text-primary focus:outline-none focus:border-accent-primary"
-                />
-            </div>  
-
-            {state.error && (
-                <p className="font-serif text-sm text-accent-primary" role="alert">
-                    {state.error}
-                </p>
-            )} 
-
+            <Field 
+                id="currentPassword"
+                name="currentPassword"
+                type="password"
+                required
+                autoComplete="current-password"
+                label="Current (temporary) password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+            />
+            <Field 
+                id="newPassword"
+                name="newPassword"
+                type="password"
+                required
+                autoComplete="new-password"
+                label="New password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+            />
+            <Field 
+                id="confirmNewPassword"
+                name="confirmNewPassword"
+                type="password"
+                required
+                autoComplete="new-password"
+                label="Confirm new password"
+                hint="Type the new password again."
+                error={mismatch ? PASSWORD_MISMATCH_MESSAGE : null}
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+            />
+            
+            <FormResult state={state} />
+            
             <div className="flex items-center gap-4">
-                <button
-                    type="submit"
-                    disabled={pending}
-                    className="bg-accent-primary text-background font-sans font-medium py-2 px-4 disabled:opacity-60 transition-colors hover:bg-accent-soft"
-                >
-                    {pending ? "Saving" : "Set password"}
-                </button>
-
+                <SubmitButton ready={ready} pending={pending} label="Save password." />
                 <Link
                     href={dashboardPath}
-                    className="font-serif text-sm text-accent-soft hover:text-accent-primary transition-colors"
+                    className="font-serif text-sm text-text-primary hover:text-accent-secondary transition-colors"
                 >
                     Skip for now
                 </Link>
-            </div> 
+            </div>
         </form>
     );
 }
