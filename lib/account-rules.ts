@@ -1,4 +1,5 @@
 import { normalizeEmail } from "./email";
+import { MIN_PASSWORD_LENGTH, PASSWORD_TOO_SHORT_MESSAGE } from "./password-policy";
 
 export const CURRENT_PASSWORD_REQUIRED_MESSAGE = "Current password is required to make changes.";
 export const NEW_EMAIL_REQUIRED_MESSAGE = "Enter a new email address.";
@@ -46,6 +47,7 @@ export function emailChangeProblem(change: EmailChange): string | null {
 export function passwordChangeProblem(change: PasswordChange): string | null {
     if (change.currentPassword === "") return CURRENT_PASSWORD_REQUIRED_MESSAGE;
     if (change.newPassword === "") return NEW_PASSWORD_REQUIRED_MESSAGE;
+    if (change.newPassword.length < MIN_PASSWORD_LENGTH) return PASSWORD_TOO_SHORT_MESSAGE;
     if (!passwordsMatch(change.newPassword, change.confirmNewPassword)) return PASSWORD_MISMATCH_MESSAGE;
     return null;
 }
