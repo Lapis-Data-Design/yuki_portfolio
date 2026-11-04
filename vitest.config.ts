@@ -12,7 +12,6 @@ export default defineConfig({
     test: {
         environment: "node",
         globals: true,
-        fileParallelism: false,
         include: ["lib/**/*.test.ts"],
         exclude: ["node_modules", "tests/**"],
     },
