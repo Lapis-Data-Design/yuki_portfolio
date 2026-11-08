@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { normalizeEmail } from "@/lib/email";
 import {
     requireUser,
     verifyPassword,
@@ -9,18 +8,20 @@ import {
     updateUserPassword,
 } from "@/lib/auth";
 import {
+    ACCOUNT_UPDATE_FAILED_MESSAGE,
+    EMAIL_IN_USE_MESSAGE,
     emailChangeProblem,
     passwordChangeProblem,
     passwordsMatch,
-    SAME_PASSWORD_MESSAGE
+    PASSWORD_TOO_SHORT_MESSAGE,
+    SAME_PASSWORD_MESSAGE,
+    CURRENT_PASSWORD_INCORRECT_MESSAGE
 } from "@/lib/account-rules";
 
 export type AccountActionState = {
     success: boolean;
     error: string | null;
 }
-
-const CURRENT_PASSWORD_INCORRECT = "Current password is incorrect.";
 
 function field(formData: FormData, name: string): string {
     const value = formData.get(name);
@@ -55,11 +56,11 @@ export async function updateEmailAction(
     if (problem) return refused(problem);
 
     if (!(await verifyPassword(currentPassword, user.passwordHash))) {
-        return refused(CURRENT_PASSWORD_INCORRECT);
+        return refused(CURRENT_PASSWORD_INCORRECT_MESSAGE);
     }
 
     const result = await updateUserEmail(user.id, newEmail);
-    if (!result.success) return refused(result.error);
+    if (!result.success) return refused(result.reason === "email-taken" ? EMAIL_IN_USE_MESSAGE : ACCOUNT_UPDATE_FAILED_MESSAGE);
 
     return refreshDashboards();
 }
@@ -81,15 +82,17 @@ export async function updatePasswordAction(
     if (problem) return refused(problem);
 
     if (!(await verifyPassword(currentPassword, user.passwordHash))) {
-        return refused(CURRENT_PASSWORD_INCORRECT);
+        return refused(CURRENT_PASSWORD_INCORRECT_MESSAGE);
     }
 
     if (passwordsMatch(newPassword, currentPassword)) {
         return refused(SAME_PASSWORD_MESSAGE);
     }
 
-    const result = await updateUserPassword(user.id, currentPassword, newPassword);
-    if(!result.success) return refused(result.error);
+    const result = await updateUserPassword(user.id, newPassword);
+    if(!result.success) return refused(
+        result.reason === "password-too-short" ? PASSWORD_TOO_SHORT_MESSAGE : ACCOUNT_UPDATE_FAILED_MESSAGE
+    );
 
     return refreshDashboards();
 }

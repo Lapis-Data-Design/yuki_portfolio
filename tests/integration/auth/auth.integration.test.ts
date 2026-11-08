@@ -109,7 +109,7 @@ describe("updateUserEmail", () => {
         await insertUser(TEST_EMAIL_2, { role: "admin" });
 
         const result = await updateUserEmail(userA.id, TEST_EMAIL_2);
-        expect(result.success).toBe(false);
+        expect(result).toEqual({ success: false, reason: "email-taken"});
     });
 
     it("stores the new email trimmed and lowercased", async () => {
@@ -127,24 +127,23 @@ describe("updateUserEmail", () => {
         await insertUser(TEST_EMAIL_2);
 
         const result = await updateUserEmail(userA.id, TEST_EMAIL_2.toUpperCase());
-        expect(result.success).toBe(false);
+        expect(result).toEqual({ success: false, reason: "email-taken"});
     });
 
     it("fails when the new email is empty after trimming", async () => {
         const user = await insertUser(TEST_EMAIL);
 
         const result = await updateUserEmail(user.id, "    ");
-        expect(result.success).toBe(false);
+        expect(result).toEqual({ success: false, reason: "email-blank"});
     });
 });
 
 describe("updateUserPassword", () => {
-    it("succeeds with the correct current password and a valid new one", async () => {
+    it("stores a valid password and clears mustChangePassword", async () => {
         const user = await insertUser(TEST_EMAIL, {mustChangePassword: true });
         
         const result = await updateUserPassword(
             user.id,
-            TEST_PASSWORD,
             "a-new-valid-password"
         );
         expect(result.success).toBe(true);
@@ -156,22 +155,17 @@ describe("updateUserPassword", () => {
         ).toBe(true);
     });
 
-    it("fails when the current password is wrong", async () => {
-        const user = await insertUser(TEST_EMAIL, { mustChangePassword: true });
-
-        const result = await updateUserPassword(
-            user.id,
-            "wrong-current-password",
-            "a-new-valid-password"
-        );
-        expect(result.success).toBe(false);
-    });
-
     it("fails when the new password is under 8 characters", async () => {
         const user = await insertUser(TEST_EMAIL, { mustChangePassword: true });
 
-        const result = await updateUserPassword(user.id, TEST_PASSWORD, "short");
-        expect(result.success).toBe(false);
+        const result = await updateUserPassword(user.id, "short");
+        expect(result).toEqual({ success: false, reason: "password-too-short" });
+        expect((await findUser(user.id)).mustChangePassword).toBe(true);
+    });
+
+    it("fails for a user that doesn't exist", async () => {
+        const result = await updateUserPassword(-1, "a-new-valid-password");
+        expect(result).toEqual({ success: false, reason: "user-not-found" });
     });
 });
 
@@ -184,5 +178,5 @@ describe("users table", () => {
 
         expect(error).toBeInstanceOf(Error);
         expect((error as Error).cause).toMatchObject({ constraint: "users_email_normalized" });
-    })
-})
+    });
+});

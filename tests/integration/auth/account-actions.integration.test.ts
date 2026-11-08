@@ -12,6 +12,9 @@ import {
     CURRENT_PASSWORD_REQUIRED_MESSAGE,
     NEW_EMAIL_REQUIRED_MESSAGE,
     NEW_PASSWORD_REQUIRED_MESSAGE,
+    PASSWORD_TOO_SHORT_MESSAGE,
+    CURRENT_PASSWORD_INCORRECT_MESSAGE,
+    EMAIL_IN_USE_MESSAGE,
 } from "@/lib/account-rules";
 import { updateEmailAction, updatePasswordAction } from "@/lib/actions/account";
 import { revalidatePath } from "next/cache";
@@ -98,12 +101,12 @@ describe("updateEmailAction", () => {
     });
 
     it("refuses a wrong current password", async () => {
-        await expectRefused({ ...valid, currentPassword: "wrong-password" }, "Current password is incorrect.");
+        await expectRefused({ ...valid, currentPassword: "wrong-password" }, CURRENT_PASSWORD_INCORRECT_MESSAGE);
     });
 
     it("refuses an email another account uses", async () => {
         await insertUser(NEW_EMAIL);
-        await expectRefused(valid, "That email is already in use.");
+        await expectRefused(valid, EMAIL_IN_USE_MESSAGE);
     });
 
     it("stores a matching new email normalized", async () => {
@@ -127,7 +130,7 @@ describe("updatePasswordAction", () => {
     }
 
     it("requires the current password", async () => {
-        await expectRefused({ ...valid, currentPassword: "" }, "Current password is required to make changes.");
+        await expectRefused({ ...valid, currentPassword: "" }, CURRENT_PASSWORD_REQUIRED_MESSAGE );
     });
 
     it("requires a new password", async () => {
@@ -139,8 +142,12 @@ describe("updatePasswordAction", () => {
     });
 
     it("refuses a wrong current password", async () => {
-        await expectRefused({ ...valid, currentPassword: "wrong-password" }, "Current password is incorrect.");
+        await expectRefused({ ...valid, currentPassword: "wrong-password" }, CURRENT_PASSWORD_INCORRECT_MESSAGE);
     });
+
+    it("refuses passwords that don't meet character length minimum", async () => {
+        await expectRefused({ ...valid, newPassword: "new", confirmNewPassword: "new" }, PASSWORD_TOO_SHORT_MESSAGE);
+    })
 
     it("refuses the current password as the new one", async () => {
         await expectRefused(
@@ -152,7 +159,7 @@ describe("updatePasswordAction", () => {
     it("says nothing about sameness when the current password is wrong", async () => {
         await expectRefused(
             { currentPassword: "wrong-password", newPassword: "wrong-password", confirmNewPassword: "wrong-password" },
-            "Current password is incorrect.",
+            CURRENT_PASSWORD_INCORRECT_MESSAGE,
         );
     });
 
