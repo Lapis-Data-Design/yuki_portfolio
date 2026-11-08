@@ -4,7 +4,7 @@ import { useActionState, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { updatePasswordAction, type AccountActionState } from "@/lib/actions/account";
-import { PASSWORD_MISMATCH_MESSAGE } from "@/lib/account-rules";
+import { PASSWORD_LENGTH_HINT, PASSWORD_MISMATCH_MESSAGE } from "@/lib/account-rules";
 import { canSavePassword, showMismatch } from "@/lib/account-form";
 import { Field, FormResult, SubmitButton } from "@/app/_components/form-fields";
 
@@ -46,6 +46,7 @@ export function ChangePasswordForm({ dashboardPath}: { dashboardPath: string }) 
                 required
                 autoComplete="new-password"
                 label="New password"
+                hint={PASSWORD_LENGTH_HINT}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
             />

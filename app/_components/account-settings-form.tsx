@@ -9,6 +9,7 @@ import {
 import {
     EMAIL_MISMATCH_MESSAGE,
     isCurrentEmail,
+    PASSWORD_LENGTH_HINT,
     PASSWORD_MISMATCH_MESSAGE,
     SAME_EMAIL_MESSAGE,
 } from "@/lib/account-rules";
@@ -205,6 +206,7 @@ function PasswordForm() {
                 required
                 autoComplete="new-password"
                 label="New password"
+                hint={PASSWORD_LENGTH_HINT}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
             />
