@@ -66,7 +66,7 @@ export function ChangePasswordForm({ dashboardPath}: { dashboardPath: string }) 
             <FormResult state={state} />
             
             <div className="flex items-center gap-4">
-                <SubmitButton ready={ready} pending={pending} label="Save password." />
+                <SubmitButton ready={ready} pending={pending} label="Set password." />
                 <Link
                     href={dashboardPath}
                     className="font-serif text-sm text-text-primary hover:text-accent-secondary transition-colors"
