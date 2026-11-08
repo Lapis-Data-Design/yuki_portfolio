@@ -8,6 +8,7 @@ import { db } from "@/db/client";
 import { users, sessions, type roles } from "@/db/schema";
 import { hashPassword, verifyPassword, generateTemporaryPassword } from "@/lib/password";
 import { normalizeEmail } from "@/lib/email";
+import { MIN_PASSWORD_LENGTH } from "./password-policy";
 import { dashboardPathFor } from "@/lib/dashboard-path";
 
 export { hashPassword, verifyPassword, generateTemporaryPassword };
@@ -150,13 +151,21 @@ export async function requireUser() {
 
 // ---- Account changes (email / password) ------------------
 
+export type UpdateEmailResult =
+    | { success: true }
+    | { success: false; reason: "email-blank" | "email-taken" };
+
+export type UpdatePasswordResult =
+    | { success: true }
+    | { success: false; reason: "password-too-short" | "user-not-found" };
+
 export async function updateUserEmail(
     userId: number,
     newEmail: string
-): Promise<{ success: true } | { success: false; error: string }> {
+): Promise<UpdateEmailResult> {
     const email = normalizeEmail(newEmail);
     if(!email) {
-        return { success: false, error: "Enter an email address." };
+        return { success: false, reason: "email-blank" };
     }
 
     const [existing] = await db
@@ -166,7 +175,7 @@ export async function updateUserEmail(
         .limit(1);
 
     if (existing && existing.id !== userId) {
-        return { success: false, error: "That email is already in use." };
+        return { success: false, reason: "email-taken" };
     }
 
     await db.update(users).set({ email: email }).where(eq(users.id, userId));
@@ -175,9 +184,10 @@ export async function updateUserEmail(
 
 export async function updateUserPassword(
     userId: number,
-    currentPassword: string,
     newPassword: string
-): Promise<{ success: true } | { success: false; error: string }> {
+): Promise<UpdatePasswordResult> {
+    if (newPassword.length < MIN_PASSWORD_LENGTH) return { success: false, reason: "password-too-short" };
+
     const [user] = await db
         .select()
         .from(users)
@@ -185,16 +195,7 @@ export async function updateUserPassword(
         .limit(1);
 
         if (!user) {
-            return { success: false, error: "User not found" };
-        }
-
-        const valid = await verifyPassword(currentPassword, user.passwordHash);
-        if (!valid) {
-            return { success: false,  error: "Current password is incorrect." };
-        }
-
-        if (newPassword.length < 8) {
-            return { success: false,  error: "New password must be at least 8 characters." };
+            return { success: false, reason: "user-not-found" };
         }
 
         const newHash = await hashPassword(newPassword);

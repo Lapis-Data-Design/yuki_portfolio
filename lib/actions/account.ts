@@ -7,58 +7,92 @@ import {
     updateUserEmail,
     updateUserPassword,
 } from "@/lib/auth";
-import { normalizeEmail } from "@/lib/email";
+import {
+    ACCOUNT_UPDATE_FAILED_MESSAGE,
+    EMAIL_IN_USE_MESSAGE,
+    emailChangeProblem,
+    passwordChangeProblem,
+    passwordsMatch,
+    PASSWORD_TOO_SHORT_MESSAGE,
+    SAME_PASSWORD_MESSAGE,
+    CURRENT_PASSWORD_INCORRECT_MESSAGE
+} from "@/lib/account-rules";
 
-type AccountFormState = {
+export type AccountActionState = {
     success: boolean;
     error: string | null;
 }
 
-export async function updateAccountAction(
-    _prevstate: AccountFormState,
-    formData: FormData
-): Promise<AccountFormState> {
-    const user = await requireUser();
+function field(formData: FormData, name: string): string {
+    const value = formData.get(name);
+    return typeof value === "string" ? value : "";
+}
 
-    const currentPassword = formData.get("currentPassword");
-    const newEmail = formData.get("newEmail");
-    const newPassword = formData.get("newPassword");
+function refused(error: string): AccountActionState {
+    return { success: false, error };
+}
 
-    if (typeof currentPassword !== "string" || !currentPassword) {
-        return { success: false, error: "Current password is required to make changes." };
-    }
-
-    const passwordValid = await verifyPassword(currentPassword, user.passwordHash);
-    if (!passwordValid) {
-        return { success: false, error: "Current password is incorrect" };
-    }
-
-    let emailChanged = false;
-    let passwordChanged  = false;
-
-    if (typeof newEmail === "string" && newEmail.trim() && normalizeEmail(newEmail) !== user.email) {
-        const result = await updateUserEmail(user.id, newEmail);
-        if (!result.success) {
-            return { success: false, error: result.error }
-        }
-        emailChanged = true;
-    }
-
-    if (typeof newPassword === "string" && newPassword) {
-        const result = await updateUserPassword(user.id, currentPassword, newPassword);
-        if (!result.success) {
-            return { success: false, error: result.error };
-        }
-
-        passwordChanged = true;
-    }
-
-    if (!emailChanged && !passwordChanged) {
-        return { success: false, error: "Enter a new email or new password to update." };
-    }
-
+function refreshDashboards(): AccountActionState {
     revalidatePath("/dashboard/owner");
     revalidatePath("/dashboard/admin");
-
     return { success: true, error: null };
+}
+
+export async function updateEmailAction(
+    _prevState: AccountActionState,
+    formData: FormData,
+): Promise<AccountActionState> {
+    const user = await requireUser();
+    const currentPassword = field(formData, "currentPassword");
+    const newEmail = field(formData, "newEmail");
+
+    const problem = emailChangeProblem({
+        currentPassword,
+        newEmail,
+        confirmNewEmail: field(formData, "confirmNewEmail"),
+        currentEmail: user.email,
+    });
+
+    if (problem) return refused(problem);
+
+    if (!(await verifyPassword(currentPassword, user.passwordHash))) {
+        return refused(CURRENT_PASSWORD_INCORRECT_MESSAGE);
+    }
+
+    const result = await updateUserEmail(user.id, newEmail);
+    if (!result.success) return refused(result.reason === "email-taken" ? EMAIL_IN_USE_MESSAGE : ACCOUNT_UPDATE_FAILED_MESSAGE);
+
+    return refreshDashboards();
+}
+
+export async function updatePasswordAction(
+    _prevState: AccountActionState,
+    formData: FormData,
+): Promise<AccountActionState> {
+    const user = await requireUser();
+    const currentPassword = field(formData, "currentPassword");
+    const newPassword = field(formData, "newPassword");
+
+    const problem = passwordChangeProblem({
+        currentPassword,
+        newPassword,
+        confirmNewPassword: field(formData, "confirmNewPassword"),
+    });
+    
+    if (problem) return refused(problem);
+
+    if (!(await verifyPassword(currentPassword, user.passwordHash))) {
+        return refused(CURRENT_PASSWORD_INCORRECT_MESSAGE);
+    }
+
+    if (passwordsMatch(newPassword, currentPassword)) {
+        return refused(SAME_PASSWORD_MESSAGE);
+    }
+
+    const result = await updateUserPassword(user.id, newPassword);
+    if(!result.success) return refused(
+        result.reason === "password-too-short" ? PASSWORD_TOO_SHORT_MESSAGE : ACCOUNT_UPDATE_FAILED_MESSAGE
+    );
+
+    return refreshDashboards();
 }

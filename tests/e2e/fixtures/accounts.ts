@@ -6,24 +6,30 @@ import { clearAllLoginThrottle } from "@/tests/helpers/login-throttle";
 
 type TestAccount = {
     email: string;
+    changedEmail?: string;
     password: string;
     role: (typeof users.$inferInsert)["role"];
     mustChangePassword: boolean;
 };
 
 export const TEST_ACCOUNTS = {
-    owner:          { email: "e2e-owner@example.test",              password: "e2e-temp-password-1",                role: "owner",  mustChangePassword: true },
-    admin:          { email: "e2e-admin@example.test",              password: "e2e-temp-password-2",                role: "admin",  mustChangePassword: false },
-    roleTestOwner:  { email: "e2e-role-owner@example.test",         password: "e2e-role-owner-password-3",          role: "owner",  mustChangePassword: false },
-    adminJourney:   { email: "e2e-admin-journey@example.test",      password: "e2e-admin-journey-temp-password-4",  role: "admin",  mustChangePassword: true },
-    expiredSession: { email: "e2e-expired-session@example.test",    password: "e2e-expired-session-password-5",     role: "owner",  mustChangePassword: false },
-    ownerLockout:   { email: "e2e-owner-lockout@example.test",      password: "e2e-owner-lockout-password-6",       role: "owner",  mustChangePassword: false },
-    adminLockout:   { email: "e2e-admin-lockout@example.test",      password: "e2e-admin-lockout-password-7",       role: "admin",  mustChangePassword: false },
-    ownerOverview:  { email: "e2e-owner-overview@example.test",     password: "e2e-owner-overview-password-8",      role: "owner",  mustChangePassword: false },
+    owner:              { email: "e2e-owner@example.test",                                                                      password: "e2e-temp-password-1",                role: "owner",  mustChangePassword: true },
+    admin:              { email: "e2e-admin@example.test",                                                                      password: "e2e-temp-password-2",                role: "admin",  mustChangePassword: false },
+    roleTestOwner:      { email: "e2e-role-owner@example.test",                                                                 password: "e2e-role-owner-password-3",          role: "owner",  mustChangePassword: false },
+    adminJourney:       { email: "e2e-admin-journey@example.test",                                                              password: "e2e-admin-journey-temp-password-4",  role: "admin",  mustChangePassword: true },
+    expiredSession:     { email: "e2e-expired-session@example.test",                                                            password: "e2e-expired-session-password-5",     role: "owner",  mustChangePassword: false },
+    ownerLockout:       { email: "e2e-owner-lockout@example.test",                                                              password: "e2e-owner-lockout-password-6",       role: "owner",  mustChangePassword: false },
+    adminLockout:       { email: "e2e-admin-lockout@example.test",                                                              password: "e2e-admin-lockout-password-7",       role: "admin",  mustChangePassword: false },
+    ownerOverview:      { email: "e2e-owner-overview@example.test",                                                             password: "e2e-owner-overview-password-8",      role: "owner",  mustChangePassword: false },
+    accountSettings:    { email: "e2e-account-settings@example.test",   changedEmail: "e2e-account-settings-new@example.test",  password: "e2e-account-settings-password-9",    role: "owner",  mustChangePassword: false },
 } satisfies Record<string, TestAccount>;
 
 export async function cleanupTestAccounts(): Promise<void> {
-    await cleanupUsersByEmail(Object.values(TEST_ACCOUNTS).map((account) => account.email));
+    await cleanupUsersByEmail(
+        Object.values(TEST_ACCOUNTS).flatMap((account) => 
+            "changedEmail" in account ? [account.email, account.changedEmail] : [account.email],
+        ),
+    );
     await clearAllLoginThrottle();
 }
 
