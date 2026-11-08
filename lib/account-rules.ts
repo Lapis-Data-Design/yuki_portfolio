@@ -1,5 +1,5 @@
 import { normalizeEmail } from "./email";
-import { MIN_PASSWORD_LENGTH, PASSWORD_TOO_SHORT_MESSAGE } from "./password-policy";
+import { MIN_PASSWORD_LENGTH } from "./password-policy";
 
 export const CURRENT_PASSWORD_REQUIRED_MESSAGE = "Current password is required to make changes.";
 export const NEW_EMAIL_REQUIRED_MESSAGE = "Enter a new email address.";
@@ -8,7 +8,11 @@ export const PASSWORD_MISMATCH_MESSAGE = "New passwords don't match.";
 export const EMAIL_MISMATCH_MESSAGE = "New emails don't match.";
 export const SAME_PASSWORD_MESSAGE = "Choose a password different from your current one.";
 export const SAME_EMAIL_MESSAGE = "That's already your email address.";
-
+export const PASSWORD_TOO_SHORT_MESSAGE = `New password must be at leadt ${MIN_PASSWORD_LENGTH} characters.`;
+export const PASSWORD_LENGTH_HINT = `At least ${MIN_PASSWORD_LENGTH} charactres.`;
+export const ACCOUNT_UPDATE_FAILED_MESSAGE = "Couldn't save the change. Try again.";
+export const CURRENT_PASSWORD_INCORRECT_MESSAGE = "Current password is incorrect.";
+export const EMAIL_IN_USE_MESSAGE = "That email is already in use.";
 
 export type EmailChange = {
     currentPassword: string;

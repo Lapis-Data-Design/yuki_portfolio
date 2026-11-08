@@ -23,15 +23,15 @@ describe("showEmailMismatch", () => {
     });
 
     it("shows once the confirmation can't match", () => {
-        expect(showEmailMismatch("owner@exmaple.test", "ownee")).toBe(true);
+        expect(showEmailMismatch("owner@example.test", "ownee")).toBe(true);
     });
 });
 
 describe("canSavePassword", () => {
     const validBase = { 
         currentPassword: "current", 
-        newPassword: "new", 
-        confirmNewPassword: "new", 
+        newPassword: "new_password", 
+        confirmNewPassword: "new_password", 
     };
     
     it("allows matching new passwords with the current password", () => {
@@ -41,7 +41,8 @@ describe("canSavePassword", () => {
     it("waits for the current password, a new password and a match", () => {
         expect(canSavePassword({ ...validBase, currentPassword: "" })).toBe(false);
         expect(canSavePassword({ ...validBase, newPassword: "", confirmNewPassword: "" })).toBe(false);
-        expect(canSavePassword({ ...validBase, confirmNewPassword: "nex" })).toBe(false);
+        expect(canSavePassword({ ...validBase, confirmNewPassword: "nex_password" })).toBe(false);
+        expect(canSavePassword({ ...validBase, newPassword: "new", confirmNewPassword: "new"})).toBe(false);
     });
 });
 
@@ -57,7 +58,7 @@ describe("canSaveEmail", () => {
         expect(canSaveEmail(validBase)).toBe(true);
     });
 
-    it("is read only when there's no problem", () => {
+    it("is ready only when there's no problem", () => {
         expect(canSaveEmail({ ...validBase, confirmNewEmail: "Owner@" })).toBe(false);
     });
 });

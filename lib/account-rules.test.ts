@@ -6,6 +6,7 @@ import {
     NEW_EMAIL_REQUIRED_MESSAGE,
     NEW_PASSWORD_REQUIRED_MESSAGE,
     SAME_EMAIL_MESSAGE,
+    PASSWORD_TOO_SHORT_MESSAGE,
     emailChangeProblem,
     passwordChangeProblem,
     isCurrentEmail,
@@ -19,7 +20,7 @@ describe("emailsMatch", () => {
     });
 
     it("rejects different or half-typed addresses", () => {
-        expect(emailsMatch("owner@example.test", "ownee@exmaple.test")).toBe(false);
+        expect(emailsMatch("owner@example.test", "ownee@example.test")).toBe(false);
         expect(emailsMatch("owner@example.test", "owner@")).toBe(false);
     });
 });
@@ -66,11 +67,11 @@ describe("emailChangeProblem", () => {
     });
 });
 
-describe("passowrdChangeProblem", () => {
+describe("passwordChangeProblem", () => {
     const valid = { 
         currentPassword: "current", 
-        newPassword: "new", 
-        confirmNewPassword: "new", 
+        newPassword: "new_password", 
+        confirmNewPassword: "new_password", 
     };
 
     it("is null for a valid change", () => {
@@ -80,12 +81,14 @@ describe("passowrdChangeProblem", () => {
     it("names the first problem, in order", () => {
         expect(passwordChangeProblem({ ...valid, currentPassword: ""})).toBe(CURRENT_PASSWORD_REQUIRED_MESSAGE);
         expect(passwordChangeProblem({ ...valid, newPassword: "", confirmNewPassword: "" })).toBe(NEW_PASSWORD_REQUIRED_MESSAGE);
-        expect(passwordChangeProblem({ ...valid, confirmNewPassword: "ne" })).toBe(PASSWORD_MISMATCH_MESSAGE);
+        expect(passwordChangeProblem({ ...valid, confirmNewPassword: "new_passwor" })).toBe(PASSWORD_MISMATCH_MESSAGE);
+        expect(passwordChangeProblem({ ...valid, newPassword: "new", confirmNewPassword: "new" })).toBe(PASSWORD_TOO_SHORT_MESSAGE);
+        expect(passwordChangeProblem({ ...valid, newPassword: "new", confirmNewPassword: "nex" })).toBe(PASSWORD_TOO_SHORT_MESSAGE);
     });
 
     it("leaves the same-as-current check to the action", () => {
         expect(
-            passwordChangeProblem({ currentPassword: "same", newPassword: "same", confirmNewPassword: "same"})
+            passwordChangeProblem({ currentPassword: "same-password", newPassword: "same-password", confirmNewPassword: "same-password"})
         ).toBeNull();
     });
 });
