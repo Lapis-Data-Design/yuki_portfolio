@@ -1,6 +1,7 @@
 import { test, expect, type Locator } from "@playwright/test";
 import { login, logout } from "../fixtures/auth-actions";
 import { TEST_ACCOUNTS } from "../fixtures/accounts";
+import { CURRENT_PASSWORD_INCORRECT_MESSAGE, EMAIL_IN_USE_MESSAGE } from "@/lib/account-rules";
 
 const TEST_ACCOUNT = TEST_ACCOUNTS.accountSettings;
 const NEW_EMAIL = TEST_ACCOUNT.changedEmail;
@@ -71,7 +72,7 @@ test.describe("owner account settings", () => {
 
         await passwordTab.click();
         await expect(passwordCurrentPassword).toHaveAccessibleDescription("Required to confirm the change.");
-        await expect(newPassword).toBeVisible();
+        await expect(newPassword).toHaveAccessibleDescription("At least 8 characters.");
         await expect(confirmNewPassword).toHaveAccessibleDescription("Type the new password again.");
 
         await passwordPanel.getByText("New password", { exact: true }).click();
@@ -140,13 +141,26 @@ test.describe("owner account settings", () => {
         await expect(savePasswordButton).toBeEnabled();
     });
 
+    test("the password save button waits for at least 8 characters", async () => {
+        await passwordTab.click();
+        await passwordCurrentPassword.fill(TEST_ACCOUNT.password);
+
+        await newPassword.fill("short");
+        await confirmNewPassword.fill("short");
+        await expect(savePasswordButton).toBeDisabled();
+
+        await newPassword.fill("long-enough");
+        await confirmNewPassword.fill("long-enough");
+        await expect(savePasswordButton).toBeEnabled();
+    })
+
     test("a wrong current password shows an error and saves nothing", async ({ page }) => {
         await emailCurrentPassword.fill("not-the-password");
         await newEmail.fill(NEW_EMAIL);
         await confirmNewEmail.fill(NEW_EMAIL);
         await saveEmailButton.click();
 
-        await expect(emailPanel.getByRole("alert")).toHaveText("Current passowrd is incorrect.");
+        await expect(emailPanel.getByRole("alert")).toHaveText("Current password is incorrect.");
         await expect(emailPanel.getByText(`Current email: ${TEST_ACCOUNT.email}`)).toBeVisible();
 
         await passwordTab.click();
@@ -156,7 +170,7 @@ test.describe("owner account settings", () => {
         await confirmNewPassword.fill(NEW_PASSWORD);
         await savePasswordButton.click();
 
-        await expect(passwordPanel.getByRole("alert")).toHaveText("Current password is incorrect.");
+        await expect(passwordPanel.getByRole("alert")).toHaveText(CURRENT_PASSWORD_INCORRECT_MESSAGE);
         await expect(page).toHaveURL(ACCOUNT_SETTINGS_URL);
     });
 
@@ -168,7 +182,7 @@ test.describe("owner account settings", () => {
         await confirmNewEmail.fill(takenEmail);
         await saveEmailButton.click();
 
-        await expect(emailPanel.getByRole("alert")).toHaveText("That email is already in use.");
+        await expect(emailPanel.getByRole("alert")).toHaveText(EMAIL_IN_USE_MESSAGE);
         await expect(emailPanel.getByText(`Current email: ${TEST_ACCOUNT.email}`)).toBeVisible();
         await expect(page).toHaveURL(ACCOUNT_SETTINGS_URL);
     });

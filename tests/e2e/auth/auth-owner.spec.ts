@@ -26,7 +26,8 @@ test("owner: auth flow from temp password to logout", async ({ page }) => {
         await page
             .getByLabel("Current (temporary) password")
             .fill(OWNER_TEST_ACCOUNT.password);
-        await page.getByLabel("New password").fill(NEW_PASSWORD);
+        await page.getByLabel("New password", { exact: true }).fill(NEW_PASSWORD);
+        await page.getByLabel("Confirm new password", { exact: true }).fill(NEW_PASSWORD);
         await page.getByRole("button", { name: "Set password" }).click();
         await expect(page).toHaveURL("/dashboard/owner");
     });
@@ -47,4 +48,4 @@ test("owner: auth flow from temp password to logout", async ({ page }) => {
         await page.goto("/dashboard/owner");
         await expect(page).toHaveURL("/login");
     });
-})
+});
