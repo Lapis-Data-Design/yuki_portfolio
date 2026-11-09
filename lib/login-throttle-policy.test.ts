@@ -2,11 +2,13 @@ import { describe, it, expect } from "vitest";
 import {
     EMAIL_FAILURE_LIMIT,
     IP_FAILURE_LIMIT,
+    ACCOUNT_FAILURE_LIMIT,
     LOGIN_LOCK_MINUTES,
     LOGIN_WINDOW_MINUTES,
     clientIpFrom,
     emailThrottleKey,
     ipThrottleKey,
+    accountThrottleKey,
     lockoutMessage,
 } from "./login-throttle-policy";
 
@@ -21,6 +23,10 @@ describe("limits", () => {
     it("gives an IP a higher ceiling than a single email", () => {
         expect(IP_FAILURE_LIMIT).toBeGreaterThan(EMAIL_FAILURE_LIMIT);
     });
+
+    it("locks an account's current-password check after 5 failures", () => {
+        expect(ACCOUNT_FAILURE_LIMIT).toBe(5);
+    }); 
 });
 
 describe("throttle key", () => {
@@ -31,6 +37,10 @@ describe("throttle key", () => {
     it("prefixes IP keys", () => {
         expect(ipThrottleKey("203.0.113.7")).toBe("ip:203.0.113.7");
     });
+
+    it("prefixes account keys with the user id", () => {
+        expect(accountThrottleKey(42)).toBe("account:42");
+    });
 });
 
 describe("clientIpFrom", () => {
@@ -38,7 +48,7 @@ describe("clientIpFrom", () => {
         expect(clientIpFrom("203.0.113.7, 10.0.0.1", null)).toBe("203.0.113.7");
     });
 
-    it("falls back to x-real-hp", () => {
+    it("falls back to x-real-ip", () => {
         expect(clientIpFrom(null, " 198.51.100.4 ")).toBe("198.51.100.4");
     });
 
