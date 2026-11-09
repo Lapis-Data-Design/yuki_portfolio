@@ -6,6 +6,8 @@ export const LOGIN_LOCK_MINUTES = 15;
 export const EMAIL_FAILURE_LIMIT = 5;
 export const IP_FAILURE_LIMIT = 20;
 
+export const ACCOUNT_FAILURE_LIMIT = 5;
+
 export const INVALID_CREDENTIALS_MESSAGE = "Invalid email or password.";
 
 export function emailThrottleKey(email: string): string {
@@ -14,6 +16,10 @@ export function emailThrottleKey(email: string): string {
 
 export function ipThrottleKey(ip: string): string {
     return `ip:${ip}`;
+}
+
+export function accountThrottleKey(userId: number): string {
+    return `account:${userId}`;
 }
 
 export function clientIpFrom(forwardedFor: string | null, realIp: string | null): string {
