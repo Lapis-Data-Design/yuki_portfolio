@@ -2,6 +2,7 @@ import { assert, vi, describe, it, expect, beforeEach  } from "vitest";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { users } from "@/db/schema";
+import * as auth from "@/lib/auth";
 import { hashPassword, verifyPassword } from "@/lib/password";
 import { cleanupUsersByEmailPattern } from "@/tests/helpers/user-cleanup";
 import { 
@@ -16,6 +17,8 @@ import {
     CURRENT_PASSWORD_INCORRECT_MESSAGE,
     EMAIL_IN_USE_MESSAGE,
 } from "@/lib/account-rules";
+import { ACCOUNT_FAILURE_LIMIT, LOGIN_LOCK_MINUTES, accountThrottleKey, lockoutMessage } from "@/lib/login-throttle-policy";
+import { clearAllLoginThrottle, rewindLoginThrottle } from "@/tests/helpers/login-throttle";
 import { updateEmailAction, updatePasswordAction } from "@/lib/actions/account";
 import { revalidatePath } from "next/cache";
 
@@ -30,7 +33,9 @@ vi.mock("@/lib/auth", async (importOriginal) => {
         requireUser: vi.fn(async () => {
             if (!session.user) throw new Error("test has no signed-in user");
             return session.user;
-        })
+        }),
+        verifyPassword: vi.fn(actual.verifyPassword),
+        clearSession: vi.fn(async () => {}),
     };
 });
 
@@ -71,7 +76,10 @@ function form(fields: Record<string, string>): FormData {
 
 beforeEach(async () => {
     await cleanupUsersByEmailPattern("%@example.test");
+    await clearAllLoginThrottle();
     vi.mocked(revalidatePath).mockClear();
+    vi.mocked(auth.verifyPassword).mockClear();
+    vi.mocked(auth.clearSession).mockClear();
     session.user = await insertUser(EMAIL);
 });
 
@@ -168,5 +176,90 @@ describe("updatePasswordAction", () => {
         expect(await verifyPassword(NEW_PASSWORD, (await findUser(signedInUser().id)).passwordHash)).toBe(true);
         expect(revalidatePath).toHaveBeenCalledWith("/dashboard/owner");
         expect(revalidatePath).toHaveBeenCalledWith("/dashboard/admin");
+    });
+});
+
+describe("current-password attempts", () => {
+    const validPassword = { currentPassword: PASSWORD, newPassword: NEW_PASSWORD, confirmNewPassword: NEW_PASSWORD };
+    const wrongPassword = { ...validPassword, currentPassword: "wrong-password" };
+    const validEmail = { currentPassword: PASSWORD, newEmail: NEW_EMAIL, confirmNewEmail: NEW_EMAIL };
+    const wrongEmail = { ...validEmail, currentPassword: "wrong-password" };
+
+    async function failPasswordAttempts(count: number) {
+        for (let i = 0; i < count; i++) {
+            expect(await updatePasswordAction(initial, form(wrongPassword))).toEqual({
+                success: false,
+                error: CURRENT_PASSWORD_INCORRECT_MESSAGE,
+            });
+        }
+    }
+
+    async function lock() {
+        await failPasswordAttempts(ACCOUNT_FAILURE_LIMIT - 1);
+        expect(await updatePasswordAction(initial, form(wrongPassword))).toEqual({
+            success: false,
+            error: lockoutMessage(LOGIN_LOCK_MINUTES),
+        });
+    }
+
+    async function passwordUnchanged() {
+        expect(await verifyPassword(PASSWORD, (await findUser(signedInUser().id)).passwordHash)).toBe(true);
+    }
+
+    it("refuses normally below the limit and keeps the session", async () => {
+        await failPasswordAttempts(ACCOUNT_FAILURE_LIMIT - 1);
+        expect(auth.clearSession).not.toHaveBeenCalled();
+    });
+
+    it("locks and ends the session on the limit", async () => {
+        await lock();
+        expect(auth.clearSession).toHaveBeenCalled();
+        await passwordUnchanged();
+    });
+
+    it("refuses the correct password while locked, without bcrypt or another logout", async () => {
+        await lock();
+        vi.mocked(auth.verifyPassword).mockClear();
+        vi.mocked(auth.clearSession).mockClear();
+
+        const locked = { success: false, error: lockoutMessage(LOGIN_LOCK_MINUTES) };
+        expect(await updatePasswordAction(initial, form(validPassword))).toEqual(locked);
+        expect(await updateEmailAction(initial, form(validEmail))).toEqual(locked);
+
+        expect(auth.verifyPassword).not.toHaveBeenCalled();
+        expect(auth.clearSession).not.toHaveBeenCalled();
+        await passwordUnchanged();
+        expect((await findUser(signedInUser().id)).email).toBe(EMAIL);
+    });
+
+    it("counts wrong passwords from both actions together", async () => {
+        await failPasswordAttempts(ACCOUNT_FAILURE_LIMIT - 1);
+        expect(await updateEmailAction(initial, form(wrongEmail))).toEqual({
+            success: false,
+            error: lockoutMessage(LOGIN_LOCK_MINUTES),
+        });
+    });
+
+    it("doesn't count submissions refused by the form rules", async () => {
+        await failPasswordAttempts(ACCOUNT_FAILURE_LIMIT - 1);
+        await updatePasswordAction(initial, form({ ...wrongPassword, confirmNewPassword: "typo-password" }));
+        expect(await updatePasswordAction(initial, form(validPassword))).toEqual({ success: true, error: null });
+    });
+
+    it("resets the count once the current password verifies, even if the save is refused as the same", async () => {
+        await failPasswordAttempts(ACCOUNT_FAILURE_LIMIT - 1);
+        expect(
+            await updatePasswordAction(
+                initial,
+                form({ currentPassword: PASSWORD, newPassword: PASSWORD, confirmNewPassword: PASSWORD }),
+            ),
+        )   .toEqual({ success: false, error: SAME_PASSWORD_MESSAGE });
+        await failPasswordAttempts(ACCOUNT_FAILURE_LIMIT - 1);
+    });
+
+    it("saves again onse the lock runs out", async () => {
+        await lock();
+        await rewindLoginThrottle(accountThrottleKey(signedInUser().id));
+        expect(await updatePasswordAction(initial, form(validPassword))).toEqual({ success: true, error: null });
     });
 });
