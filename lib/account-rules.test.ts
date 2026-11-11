@@ -7,7 +7,6 @@ import {
     NEW_PASSWORD_REQUIRED_MESSAGE,
     SAME_EMAIL_MESSAGE,
     PASSWORD_TOO_SHORT_MESSAGE,
-    accountLockedMessage,
     accountLockedLoggedOutMessage,
     emailChangeProblem,
     passwordChangeProblem,
