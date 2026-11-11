@@ -27,11 +27,15 @@ export async function rewindLoginThrottle(key: string, minutes = 16): Promise<vo
 }
 
 export async function rewindLoginThrottleForEmail(email: string, minutes = 16): Promise<void> {
+    await rewindLoginThrottle(emailThrottleKey(email), minutes);
+}
+
+export async function rewindAccountThrottleForEmail(email: string, minutes = 16): Promise<void> {
     assertTestBranch();
     const [user] = await db
         .select({ id: users.id })
         .from(users)
         .where(eq(users.email, normalizeEmail(email)));
-    if (!user) throw new Error(`No user with email ${email}.`);
-    await rewindLoginThrottle(emailThrottleKey(email), minutes);
+    if(!user) throw new Error(`No user with email ${email}.`);
+    await rewindLoginThrottle(accountThrottleKey(user.id), minutes);
 }

@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import { login, logout } from "../fixtures/auth-actions";
 import { TEST_ACCOUNTS } from "../fixtures/accounts";
-import { rewindLoginThrottleForEmail } from "@/tests/helpers/login-throttle";
+import { rewindAccountThrottleForEmail } from "@/tests/helpers/login-throttle";
 import { 
     ACCOUNT_FAILURE_LIMIT,
     LOGIN_LOCK_MINUTES,
@@ -57,7 +57,7 @@ test("account: wrong current passwords lock the check and log out, then it recov
     });
     
     await test.step("once the lock runs out, the change saves and the new password logs in", async () => {
-        await rewindLoginThrottleForEmail(ACCOUNT.email);
+        await rewindAccountThrottleForEmail(ACCOUNT.email);
         const panel = await openPasswordTab(page);
         await submitPassword(page, ACCOUNT.password);
         await expect(panel.getByText("Saved.")).toBeVisible();
