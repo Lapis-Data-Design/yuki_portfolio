@@ -16,7 +16,6 @@ import {
     PASSWORD_TOO_SHORT_MESSAGE,
     CURRENT_PASSWORD_INCORRECT_MESSAGE,
     EMAIL_IN_USE_MESSAGE,
-    accountLockedLoggedOutMessage,
 } from "@/lib/account-rules";
 import { ACCOUNT_FAILURE_LIMIT, LOGIN_LOCK_MINUTES, accountThrottleKey, lockoutMessage } from "@/lib/login-throttle-policy";
 import { clearAllLoginThrottle, rewindLoginThrottle } from "@/tests/helpers/login-throttle";
@@ -199,7 +198,7 @@ describe("current-password attempts", () => {
         await failPasswordAttempts(ACCOUNT_FAILURE_LIMIT - 1);
         expect(await updatePasswordAction(initial, form(wrongPassword))).toEqual({
             success: false,
-            error: accountLockedLoggedOutMessage(LOGIN_LOCK_MINUTES),
+            error: lockoutMessage(LOGIN_LOCK_MINUTES),
         });
     }
 
@@ -225,7 +224,7 @@ describe("current-password attempts", () => {
 
         const locked = { success: false, error: lockoutMessage(LOGIN_LOCK_MINUTES) };
         expect(await updatePasswordAction(initial, form(validPassword))).toEqual(locked);
-        expect(await updateEmailAction(initial, form(validEmail))).toBe(locked);
+        expect(await updateEmailAction(initial, form(validEmail))).toEqual(locked);
 
         expect(auth.verifyPassword).not.toHaveBeenCalled();
         expect(auth.clearSession).not.toHaveBeenCalled();
@@ -237,7 +236,7 @@ describe("current-password attempts", () => {
         await failPasswordAttempts(ACCOUNT_FAILURE_LIMIT - 1);
         expect(await updateEmailAction(initial, form(wrongEmail))).toEqual({
             success: false,
-            error: accountLockedLoggedOutMessage(LOGIN_LOCK_MINUTES),
+            error: lockoutMessage(LOGIN_LOCK_MINUTES),
         });
     });
 

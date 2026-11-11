@@ -1,6 +1,5 @@
 import { normalizeEmail } from "./email";
 import { MIN_PASSWORD_LENGTH } from "./password-policy";
-import { lockoutMessage } from "./login-throttle-policy";
 
 export const CURRENT_PASSWORD_REQUIRED_MESSAGE = "Current password is required to make changes.";
 export const NEW_EMAIL_REQUIRED_MESSAGE = "Enter a new email address.";
@@ -55,8 +54,4 @@ export function passwordChangeProblem(change: PasswordChange): string | null {
     if (change.newPassword.length < MIN_PASSWORD_LENGTH) return PASSWORD_TOO_SHORT_MESSAGE;
     if (!passwordsMatch(change.newPassword, change.confirmNewPassword)) return PASSWORD_MISMATCH_MESSAGE;
     return null;
-}
-
-export function accountLockedLoggedOutMessage(minutesLeft: number): string {
-    return `${lockoutMessage(minutesLeft)} You've been logged out.`;
 }

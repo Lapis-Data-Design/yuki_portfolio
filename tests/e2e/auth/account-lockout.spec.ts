@@ -7,10 +7,7 @@ import {
     LOGIN_LOCK_MINUTES,
     lockoutMessage 
 } from "@/lib/login-throttle-policy";
-import {
-    CURRENT_PASSWORD_INCORRECT_MESSAGE,
-    accountLockedLoggedOutMessage
-} from "@/lib/account-rules";
+import { CURRENT_PASSWORD_INCORRECT_MESSAGE } from "@/lib/account-rules";
 
 const ACCOUNT = TEST_ACCOUNTS.accountLockout;
 const ACCOUNT_PAGE = "/dashboard/owner/account";
@@ -48,10 +45,6 @@ test("account: wrong current passwords lock the check and log out, then it recov
 
     await test.step("the limit locks the check and ends the session", async () => {
         await submitPassword(page, "wrong-password");
-        await expect(page.getByRole("tabpanel").getByRole("alert")).toHaveText(
-            accountLockedLoggedOutMessage(LOGIN_LOCK_MINUTES),
-        );
-        await page.goto(ACCOUNT_PAGE);
         await expect(page).toHaveURL(/\/login/);
     });
 

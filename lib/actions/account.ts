@@ -17,7 +17,6 @@ import {
     passwordsMatch,
     PASSWORD_TOO_SHORT_MESSAGE,
     SAME_PASSWORD_MESSAGE,
-    accountLockedLoggedOutMessage,
 } from "@/lib/account-rules";
 import { clearThrottle, lockedMinutes, recordFailure } from "../login-throttle";
 import { ACCOUNT_FAILURE_LIMIT, accountThrottleKey, lockoutMessage } from "../login-throttle-policy";
@@ -59,7 +58,7 @@ async function currentPasswordProblem(user: SignedInUser, currentPassword: strin
     if (lockedNow === null) return CURRENT_PASSWORD_INCORRECT_MESSAGE;
 
     await clearSession();
-    return accountLockedLoggedOutMessage(lockedNow);
+    return lockoutMessage(lockedNow);
 }
 
 export async function updateEmailAction(

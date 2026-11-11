@@ -7,7 +7,6 @@ import {
     NEW_PASSWORD_REQUIRED_MESSAGE,
     SAME_EMAIL_MESSAGE,
     PASSWORD_TOO_SHORT_MESSAGE,
-    accountLockedLoggedOutMessage,
     emailChangeProblem,
     passwordChangeProblem,
     isCurrentEmail,
@@ -91,13 +90,5 @@ describe("passwordChangeProblem", () => {
         expect(
             passwordChangeProblem({ currentPassword: "same-password", newPassword: "same-password", confirmNewPassword: "same-password"})
         ).toBeNull();
-    });
-});
-
-describe("account lockout messages", () => {
-    it("says the session ended when the lock starts", () => {
-        expect(accountLockedLoggedOutMessage(15)).toBe(
-            "Too many attempts. Try again in 15 minutes. You've been logged out."
-        );
     });
 });
