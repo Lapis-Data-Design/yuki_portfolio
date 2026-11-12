@@ -10,7 +10,7 @@ const ACCOUNT_SETTINGS_URL = "/dashboard/owner/account";
 
 test.describe.configure({ mode: "serial" });
 
-test.describe("owner account settings", () => {
+test.describe("account settings (owner page)", () => {
     let main: Locator;
     let emailTab: Locator;
     let passwordTab: Locator;
@@ -47,6 +47,11 @@ test.describe("owner account settings", () => {
         newPassword = passwordPanel.getByLabel("New password", { exact: true });
         confirmNewPassword = passwordPanel.getByLabel("Confirm new password", { exact: true });
         savePasswordButton = passwordPanel.getByRole("button", { name: "Save password" });
+    });
+
+    test("shows its frame label and heading", async () => {
+        await expect(main.getByText("No. 002", { exact: true })).toBeVisible();
+        await expect(main.getByRole("heading", { level: 1, name: "Account Settings" })).toBeVisible();
     });
 
     test("tabs switch between the email and password forms", async () => {
