@@ -2,7 +2,7 @@
 
 Open and `[?]` tasks only. `[ ]` = open, `[?]` = proposed but not confirmed in the code — check the code, then mark `[x]` (and move it) or `[ ]`. Finished tasks move word for word to `docs/completed-tasks.md` under the same section number, so a "see section N" reference to done work may point there. Moved into the repo 2026-11-12 from the claude.ai project's `task-list.md`; older text may mention `project-context.md`, `claude/completed-tasks.md` or `context/week-of-*.md` (the archived claude.ai docs; decisions and gotchas are now in `docs/decisions.md` and `docs/gotchas.md`).
 
-**Next up:** merge `dark-reader-lock` (section 8), then the `script-env.ts` connection-string leak (section 3, first item). (The next *decision* is still palette editing model, decision 1.)
+**Next up:** merge `fix-script-env-url-leak` (section 8), then the two verify items in section 5 (`db-helpers.ts` gone, `global-teardown.ts` cleanup). (The next *decision* is still palette editing model, decision 1.)
 
 ---
 
@@ -24,9 +24,7 @@ Open and `[?]` tasks only. `[ ]` = open, `[?]` = proposed but not confirmed in t
 - [ ] When a production database exists, run the same email check there, then the `users_email_normalized` migration (added 2026-10-30); the migration fails if any existing email has capitals or surrounding spaces.
 
 ## 3. Auth
-- [ ] `script-env.ts`: wrap `new URL(databaseUrl)` in try/catch and throw a generic message — Node's `Invalid URL` error includes the full connection string (password) and `runScript` would print it
-- [ ] Confirm `.env.local` / `.env.test` are git-ignored (`git check-ignore .env.local .env.test`); if either was ever committed, rotate the Neon password
-- [?] Add `/change-password` to the robots disallow list
+All done as of 2026-11-17; see `docs/completed-tasks.md` section 3.
 
 ## 4. Testing and CI
 - [ ] Optional: cache `.next/cache` in the CI e2e job if the production build makes it slow (more likely now that CI really builds; added 2026-10-09)
@@ -71,7 +69,7 @@ Open and `[?]` tasks only. `[ ]` = open, `[?]` = proposed but not confirmed in t
 All five steps done as of 2026-10-18; moved to `docs/completed-tasks.md` section 8.
 
 ### Not sequenced
-- [ ] Merge `dark-reader-lock` into `main` (added 2026-11-17; PR "Lock out Dark Reader from re-coloring the site", body drafted 2026-11-17 from the template). Plan, as-built notes and commits in `docs/completed-tasks.md` section 7.
+- [ ] Merge `fix-script-env-url-leak` into `main` (added 2026-11-17). Plan, as-built notes and commits in `docs/completed-tasks.md` section 3.
 - [ ] Palette manager UI at `/dashboard/owner/palettes` (blocked by decision 1). Adds the Palettes link back to the owner nav (removed in `owner-overview`, decided 2026-11-01).
 - [ ] Public About page (credits layout depends on decision 3)
 - [ ] Photography detail extras, once real photos exist (deferred 2026-10-18): an overlay over the contact sheet via intercepting routes (`@modal` + `(.)[frameNumber]`, keeping the current page as the direct-load fallback), and whether the slide-projector motion moment lives in photo-to-photo navigation.
