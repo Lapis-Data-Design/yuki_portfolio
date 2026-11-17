@@ -4,7 +4,7 @@ import { TEST_ACCOUNTS } from "../fixtures/accounts";
 
 const TEST_ACCOUNT = TEST_ACCOUNTS.adminAccountSettings;
 const NEW_PASSWORD = "e2e-admin-account-settings-new-password";
-const ACCOUNT_SETTINGS_URL = "/dashboard/admin/accounts";
+const ACCOUNT_SETTINGS_URL = "/dashboard/admin/account";
 
 test.describe.configure({ mode: "serial" });
 
