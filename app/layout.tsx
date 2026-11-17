@@ -25,6 +25,7 @@ const zillaSlab = Zilla_Slab({
 export const metadata: Metadata = {
   title: {default: SITE.name, template: `%s | ${SITE.name}`},
   description: SITE.description,
+  other: { "darkreader-lock": "true" },
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
