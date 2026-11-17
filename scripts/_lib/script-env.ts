@@ -21,9 +21,17 @@ export function loadScriptEnv({ allowTestBranch = false }: LoadOptions = {}) {
         throw new Error("This script refuses to run against the Neon test branch.");
     }
 
-    const host = new URL(databaseUrl).host;
+    const host = databaseHost(databaseUrl, envFile);
     console.log(`Target: ${host} (from ${envFile})\n`);
     return { envFile, host };
+}
+
+function databaseHost(databaseUrl: string, envFile: string) {
+    try{
+        return new URL(databaseUrl).host;
+    } catch {
+        throw new Error(`DATABASE_URL in ${envFile} is not a valid URL.`);
+    }
 }
 
 export function runScript(main: () => Promise<void>) {
