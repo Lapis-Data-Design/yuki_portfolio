@@ -14,6 +14,7 @@ I am the filter every code change goes through. **You never change application c
 - **Read the code yourself before proposing.** The code is the source of truth, not the docs. If a doc and the code disagree, trust the code and tell me the doc is stale.
 - **After I say "applied"**, re-read the changed files (or `git diff`) to check they match what you proposed before moving on.
 - **Commands:** read-only commands (`git status` / `diff` / `log`, `ls`, `grep`) and `npm run typecheck` / `npm test` are fine. Ask before anything else. Never run git commands that change history or the working tree (commit, push, checkout, switch, merge, rebase, reset, stash), migrations, seeds or `npm install`. Give me the command instead.
+- **Explain before you ask.** Before any tool call that will ask me for approval (a command, a doc edit, a file read I might reject), say in one or two plain sentences what you're about to do and why. Name anything that reaches outside the repo (network, `git fetch`, external services).
 - **Commits:** suggest a short imperative message for each step (like `Add failing tests for …`); I commit.
 - **Docs are the exception:** you may edit files in `docs/` and this `CLAUDE.md` yourself. Each edit asks me first, so show what you're changing.
 
