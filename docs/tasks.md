@@ -2,7 +2,7 @@
 
 Open and `[?]` tasks only. `[ ]` = open, `[?]` = proposed but not confirmed in the code — check the code, then mark `[x]` (and move it) or `[ ]`. Finished tasks move word for word to `docs/completed-tasks.md` under the same section number, so a "see section N" reference to done work may point there. Moved into the repo 2026-11-12 from the claude.ai project's `task-list.md`; older text may mention `project-context.md`, `claude/completed-tasks.md` or `context/week-of-*.md` (the archived claude.ai docs; decisions and gotchas are now in `docs/decisions.md` and `docs/gotchas.md`).
 
-**Next up:** merge `fix-admin-account-settings` (section 8), then the Dark Reader lock as a quick PR (section 7). (The next *decision* is still palette editing model, decision 1.)
+**Next up:** merge `dark-reader-lock` (section 8), then the `script-env.ts` connection-string leak (section 3, first item). (The next *decision* is still palette editing model, decision 1.)
 
 ---
 
@@ -61,7 +61,6 @@ Open and `[?]` tasks only. `[ ]` = open, `[?]` = proposed but not confirmed in t
 - [ ] `app/dashboard/owner/layout.tsx`: nav links hover red (`hover:text-accent-primary`, 3.1:1 at `text-sm`); switch to amber (`hover:text-accent-secondary`) like the public nav. Check the admin layout too (added 2026-11-02).
 - [ ] Integration cleanup pattern `%@example.test` also matches the e2e accounts. Safe in CI (jobs run in sequence and e2e reseeds), but running integration and e2e at the same time locally would delete e2e users mid-run. If that bites: give integration its own domain (e.g. `@integration.example.test`) and narrow the pattern. The same applies to `login_throttle` (since 2026-10-19 both suites clear the whole table).
 - [ ] `scripts/seed-frames.ts` (seen 2026-10-21): statically imports `discipline` from `@/db/schema` without using it (remove; the schema is otherwise imported dynamically after `loadScriptEnv`), and the "already sest" log message has a typo.
-- [ ] Dark Reader lock (added 2026-11-17; quick PR right after `fix-admin-account-settings`, own branch e.g. `dark-reader-lock`). The Dark Reader extension rewrites `<html>`'s style before hydration (dev shows a hydration mismatch listing `--darkreader-*` variables) and re-colors the already-dark night-city palette. Add `other: { "darkreader-lock": "true" }` to `metadata` in `app/layout.tsx` (renders `<meta name="darkreader-lock">`; Dark Reader checks only that the tag exists, and the value is non-empty in case Next drops empty ones). Test first: an e2e check in a new `tests/e2e/public/meta.spec.ts` that `/` has one `meta[name="darkreader-lock"]`. Note: Next merges metadata one key deep, so a page that sets its own `other` would drop the tag (none do today).
 - [ ] `lib/frames.ts`: `cacheLife("max")` / `return rows` in `getFramesByDiscipline` are indented one level too deep (cosmetic, seen 2026-10-15). Marked fixed 2026-10-24 in the Video detail route PR, but **the file seen 2026-11-01 still has the extra indent**. Also imports `FrameInSequence` without `type` (works; `type` would match the other type imports).
 - [ ] `package.json`: `seed:palettes` runs `tsx scripts/seed-palettes` (no `.ts`), unlike the other seed scripts. Add the extension for consistency (seen 2026-10-15; still there 2026-10-21).
 - [ ] `lib/auth.ts` (seen 2026-10-19): the bodies of `authenticateUser`, `updateUserEmail` and `updateUserPassword` are indented one level too deep after their first statement (cosmetic). (`authenticateUser` fixed 2026-10-26 in `fix-login-timing-leak`; `updateUserEmail` fixed 2026-10-30 in `fix-login-email-case`; `updateUserPassword` remains, still over-indented in the files seen 2026-11-08 and 2026-11-11. A `.returning({ id })` version that drops the separate select and fixes the indent was suggested 2026-11-08; not confirmed applied.)
@@ -72,7 +71,7 @@ Open and `[?]` tasks only. `[ ]` = open, `[?]` = proposed but not confirmed in t
 All five steps done as of 2026-10-18; moved to `docs/completed-tasks.md` section 8.
 
 ### Not sequenced
-- [ ] Merge `fix-admin-account-settings` into `main` (added 2026-11-17; PR "Share the account settings page between owner and admin", body drafted 2026-11-17 from the template). Plan, as-built notes and commits in `docs/completed-tasks.md` section 6.
+- [ ] Merge `dark-reader-lock` into `main` (added 2026-11-17; PR "Lock out Dark Reader from re-coloring the site", body drafted 2026-11-17 from the template). Plan, as-built notes and commits in `docs/completed-tasks.md` section 7.
 - [ ] Palette manager UI at `/dashboard/owner/palettes` (blocked by decision 1). Adds the Palettes link back to the owner nav (removed in `owner-overview`, decided 2026-11-01).
 - [ ] Public About page (credits layout depends on decision 3)
 - [ ] Photography detail extras, once real photos exist (deferred 2026-10-18): an overlay over the contact sheet via intercepting routes (`@modal` + `(.)[frameNumber]`, keeping the current page as the direct-load fallback), and whether the slide-projector motion moment lives in photo-to-photo navigation.
