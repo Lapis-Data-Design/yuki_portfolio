@@ -19,7 +19,9 @@ test.describe("admin account settings", () => {
         const main = page.getByRole("main");
         
         await expect(main.getByText("Roll 00B", { exact: true })).toBeVisible();
-        await expect(main.getByRole("tab", { name: "Email"}).getByText(`Current email: ${TEST_ACCOUNT.email}`)).toBeVisible();
+        await expect(main.getByRole("heading", { level: 1, name: "Account Settings" })).toBeVisible();
+        await expect(main.getByRole("tab", { name: "Email" })).toHaveAttribute("aria-selected", "true");
+        await expect(main.getByRole("tabpanel", { name: "Email"}).getByText(`Current email: ${TEST_ACCOUNT.email}`)).toBeVisible();
     });
 
     test("a saved password works at the next login", async ({ page }) => {
