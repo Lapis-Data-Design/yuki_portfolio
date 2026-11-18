@@ -67,7 +67,7 @@ beforeEach(async () => {
 });
 
 describe.each(GATES)("$name", ({ gate, allowed }) => {
-    it("redirects to /login with on session cookie", async () => {
+    it("redirects to /login with no session cookie", async () => {
         expect(await redirectTarget(gate)).toBe("/login");
     });
 
