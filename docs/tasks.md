@@ -2,7 +2,7 @@
 
 Open and `[?]` tasks only. `[ ]` = open, `[?]` = proposed but not confirmed in the code — check the code, then mark `[x]` (and move it) or `[ ]`. Finished tasks move word for word to `docs/completed-tasks.md` under the same section number, so a "see section N" reference to done work may point there. Moved into the repo 2026-11-12 from the claude.ai project's `task-list.md`; older text may mention `project-context.md`, `claude/completed-tasks.md` or `context/week-of-*.md` (the archived claude.ai docs; decisions and gotchas are now in `docs/decisions.md` and `docs/gotchas.md`).
 
-**Next up:** merge `fix-script-env-url-leak` (section 8), then the two verify items in section 5 (`db-helpers.ts` gone, `global-teardown.ts` cleanup). (The next *decision* is still palette editing model, decision 1.)
+**Next up:** merge `auth-gate-tests` (role-gate integration tests, done 2026-11-17; see `docs/completed-tasks.md` section 6), then owner dashboard on phones (section 6). (The next *decision* is still palette editing model, decision 1.)
 
 ---
 
@@ -32,16 +32,14 @@ All done as of 2026-11-17; see `docs/completed-tasks.md` section 3.
 - [ ] Optional: run `npm run typecheck` before every commit via a pre-commit hook (e.g. `simple-git-hooks` or Husky), so type errors are caught before CI (added 2026-10-21). Low priority once CI checks types.
 
 ## 5. Verify or apply (designed, status unconfirmed)
-- [ ] `db-helpers.ts`: no `tests/integration/helpers/` directory exists in the 2026-10-05 tree — confirm the file is already gone (or find where it moved) and that nothing still imports it
-- [ ] `tests/e2e/global-teardown.ts`: `await cleanupTestAccounts();` (since 2026-10-19 `cleanupTestAccounts` also clears `login_throttle`)
+All done as of 2026-11-17; see `docs/completed-tasks.md` section 5.
 
 ## 6. New work
 - [ ] Flesh out the dashboards (added 2026-10-09). The admin overview is still a placeholder (`Roll 00A` heading + one paragraph). The owner overview is built (v1 merged 2026-11-02; its scope and as-built notes are in `docs/completed-tasks.md` section 6), and the owner nav no longer links to the unbuilt `/frames`, `/palettes` and `/projects`. Admin route content is blocked by decision 2, the palette manager by decision 1.
 - [ ] Optional: explain an account lockout on `/login` (added 2026-11-11, from `fix-account-password-throttle`). The wrong current password that locks the account check ends the session, and the account page's gate sends the browser to `/login` before the action's message can show, so the owner lands there with no explanation; the lockout message only appears if they log back in and try again during the lock. A note would need the action to redirect to something like `/login?locked=1` and the login page to read it, which makes `/login` dynamic (it's fully static now).
 - [ ] Owner dashboard on phones (added 2026-11-02): the layout's fixed `w-56` sidebar leaves a narrow main column at phone width. Give the dashboard layouts a phone treatment (e.g. sidebar on top).
 - [ ] Test the owner overview's fallback palette path ("Built-in default" when `getActivePaletteName()` returns `null`; added 2026-11-02). The e2e spec covers only the seeded palette.
-- [ ] Audit remaining `lib/actions/` files (bio, credits, photos, stop motion) for owner-only gating
-- [ ] Integration tests for `requireOwner` / `requireOwnerOrAdmin` / `requireAdminOnly` (assert `NEXT_REDIRECT` target). Use `createValidSession` / `insertSession` from `tests/helpers/sessions.ts` for the logged-in state.
+- [ ] Audit remaining `lib/actions/` files (bio, credits, photos, stop motion) for owner-only gating. (2026-11-17: none of those files exist yet; `lib/actions/` holds only `account.ts`, `auth.ts` and `theme.ts`, all of which call a gate. Do this when the new action files land.)
 - [ ] `/dashboard/admin/**` route content (blocked by decision 2)
 - [ ] Integration test for `activatePalette` (switches the active row; unknown id changes nothing) — it was never exercised, which hid the transaction bug. Note: after the migration it calls `updateTag`, which only works inside a Server Action request, so the test may need to mock `next/cache`.
 - [ ] Frame management Server Actions (owner dashboard `/frames`; added 2026-10-15): create/edit/reorder/feature frames and `setHeroFrame` (one `db.batch`: clear the current hero, set the new one, like `activatePalette`). Every action gates with `requireOwnerOrAdmin` and calls `updateTag(FRAMES_CACHE_TAG)`. Until these exist, frame changes need a cache clear or redeploy. (2026-11-01: the Frames page adds its link back to the owner nav, and the overview's Work links point at it.)
@@ -63,13 +61,15 @@ All done as of 2026-11-17; see `docs/completed-tasks.md` section 3.
 - [ ] `package.json`: `seed:palettes` runs `tsx scripts/seed-palettes` (no `.ts`), unlike the other seed scripts. Add the extension for consistency (seen 2026-10-15; still there 2026-10-21).
 - [ ] `lib/auth.ts` (seen 2026-10-19): the bodies of `authenticateUser`, `updateUserEmail` and `updateUserPassword` are indented one level too deep after their first statement (cosmetic). (`authenticateUser` fixed 2026-10-26 in `fix-login-timing-leak`; `updateUserEmail` fixed 2026-10-30 in `fix-login-email-case`; `updateUserPassword` remains, still over-indented in the files seen 2026-11-08 and 2026-11-11. A `.returning({ id })` version that drops the separate select and fixes the indent was suggested 2026-11-08; not confirmed applied.)
 
+- [ ] Retire `tests/test-utils.ts` (added 2026-11-17). It only re-exports `vitest`, and the helpers it was meant to collect went to `tests/helpers/` instead. Most test files import `"vitest"` directly, and a file that calls `vi.mock` / `vi.hoisted` must, or it fails with `Cannot access '__vi_import_0__' before initialization` (hit in `auth-gate-tests`). Switch the 5 files that still use it (`lib/dashboard-path.test.ts`, `lib/password.test.ts`, `lib/theme-tokens.test.ts`, `auth.integration.test.ts`, `login-throttle.integration.test.ts`) to `"vitest"`, grep again for imports, then `git rm tests/test-utils.ts`. Small PR on its own.
+
 ## 8. Build queue
 
 ### In order (build order agreed 2026-10-07)
 All five steps done as of 2026-10-18; moved to `docs/completed-tasks.md` section 8.
 
 ### Not sequenced
-- [ ] Merge `fix-script-env-url-leak` into `main` (added 2026-11-17). Plan, as-built notes and commits in `docs/completed-tasks.md` section 3.
+- [ ] Merge `auth-gate-tests` into `main` (added 2026-11-17). Test and docs only; as-built notes in `docs/completed-tasks.md` section 6.
 - [ ] Palette manager UI at `/dashboard/owner/palettes` (blocked by decision 1). Adds the Palettes link back to the owner nav (removed in `owner-overview`, decided 2026-11-01).
 - [ ] Public About page (credits layout depends on decision 3)
 - [ ] Photography detail extras, once real photos exist (deferred 2026-10-18): an overlay over the contact sheet via intercepting routes (`@modal` + `(.)[frameNumber]`, keeping the current page as the direct-load fallback), and whether the slide-projector motion moment lives in photo-to-photo navigation.
