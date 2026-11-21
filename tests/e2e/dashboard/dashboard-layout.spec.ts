@@ -7,7 +7,7 @@ const DESKTOP = { width: 1280, height: 800 };
 
 const DASHBOARDS = [
   {  name: "owner", account: TEST_ACCOUNTS.dashboardLayoutOwner, url: /\/dashboard\/owner$/ },
-  {  name: "admin", account: TEST_ACCOUNTS.dashboardLayoutOwner, url: /\/dashboard\/owner$/ },
+  {  name: "admin", account: TEST_ACCOUNTS.dashboardLayoutAdmin, url: /\/dashboard\/admin$/ },
 ] as const;
 
 async function box(locator: Locator) {

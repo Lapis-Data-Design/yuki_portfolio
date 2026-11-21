@@ -1,5 +1,5 @@
 import { requireAdminOnly } from "@/lib/auth";
-import { DashboardShell } from "@/app/_components/dashboard-shell";
+import { DashboardShell } from "@/app/dashboard/_components/dashboard-shell";
 
 export const instant = false;
 

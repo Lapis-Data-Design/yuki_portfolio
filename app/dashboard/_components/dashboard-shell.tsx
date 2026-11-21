@@ -1,4 +1,4 @@
-import { LogoutButton } from "./logout-button";
+import { LogoutButton } from "@/app/_components/logout-button";
 
 type NavItem = { readonly href: string; readonly label: string};
 
@@ -22,8 +22,11 @@ export function DashboardShell({
                     <p className="font-mono text-xs tracking-wide text-accent-soft mb-1">
                         {label}
                     </p>
-                    <p className="font-sans text-lg font-semibold text-text-primary mb-4 md:mb-8">
+                    <p className="font-sans text-lg font-semibold text-text-primary mb-2 md:mb-2">
                         {title}
+                    </p>
+                     <p className="font-serif text-xs text-accent-soft break-all mb-2 md:mb-4">
+                        {email}
                     </p>
                     <nav className="flex flex-wrap gap-x-6 gap-y-2 md:block md:space-y-3">
                         {navItems.map((item) => (
@@ -37,16 +40,10 @@ export function DashboardShell({
                         ))}
                     </nav>
                 </div>
-
-                <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 md:block">
-                    <p className="font-serif text-xs text-accent-soft break-all md:mb-2">
-                        {email}
-                    </p>
-                    <LogoutButton />
-                </div>
+                <LogoutButton />
             </aside>
             
-            <main className="flex-1 min-w-0 px-4 py-8 md:px-10"> {children} </main>
+            <main className="flex-1 min-w-0 px-4 py-8 md:px-10">{children}</main>
         </div>
     );
 }

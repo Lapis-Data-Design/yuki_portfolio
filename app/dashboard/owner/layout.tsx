@@ -1,6 +1,5 @@
 import { requireOwnerOrAdmin } from "@/lib/auth";
-import { LogoutButton } from "../../_components/logout-button";
-import { DashboardShell } from "@/app/_components/dashboard-shell";
+import { DashboardShell } from "@/app/dashboard/_components/dashboard-shell";
 
 export const instant = false;
 
