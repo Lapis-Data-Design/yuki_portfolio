@@ -24,6 +24,8 @@ export const TEST_ACCOUNTS = {
     accountSettings:        { email: "e2e-account-settings@example.test",   changedEmail: "e2e-account-settings-new@example.test",  password: "e2e-account-settings-password-9",            role: "owner",  mustChangePassword: false },
     accountLockout:         { email: "e2e-account-lockout@example.test",                                                            password: "e2e-account-lockout-password-10",            role: "owner",  mustChangePassword: false },
     adminAccountSettings:   { email: "e2e-admin-account-settings@example.test",                                                     password: "e2e-admin-account-settings-password-11",     role: "admin",  mustChangePassword: false },
+    dashboardLayoutOwner:    { email: "e2e-dashboard-layout-owner@example.test",                                                     password: "e2e-dashboard-layout-owner-password-12",     role: "owner",  mustChangePassword: false },
+    dashboardLayoutAdmin:    { email: "e2e-dashboard-layout-admin@example.test",                                                     password: "e2e-dashboard-layout-admin-password-13",     role: "admin",  mustChangePassword: false },
 } satisfies Record<string, TestAccount>;
 
 export async function cleanupTestAccounts(): Promise<void> {
